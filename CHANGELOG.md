@@ -4,6 +4,12 @@ What changed, when, and what was measured. Newest first.
 The current state of the project is in [README.md](README.md); what is still
 broken or deferred is in [TODOS.md](TODOS.md).
 
+## Every mistake on the page — 11 October 2026
+
+The page capped corrections at 10 from speech and 6 from typing, without
+saying so: on 10 Oct it showed 6 of 36. The cap is gone; 10 Oct re-run shows
+all 37 plus one repeat from history. Test: `test_every_mistake_reaches_the_page`.
+
 ## Setup asks nothing; the page opens when it is ready — 10 October 2026
 
 - `tharoor setup` no longer asks the two consent questions. It tells you two

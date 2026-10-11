@@ -108,3 +108,21 @@ def test_report_shows_corrections_and_no_pronunciation():
     rendered = report.build_html(date.today(), [row])
     assert "he doesn&#x27;t" in rendered and "What you typed" in rendered
     assert "Pronunciation" not in rendered and "<audio" not in rendered
+
+
+def test_every_mistake_reaches_the_page(monkeypatch):
+    # 10 Oct: 36 corrections found, 6 shown, and the page never said so.
+    from mr_tharoor import grammar, log, typed
+
+    monkeypatch.setattr(log, "get", lambda *a: SimpleNamespace(info=lambda *a: None, warning=lambda *a: None,
+                                                             error=lambda *a: None))
+    monkeypatch.setattr(schedule, "on_battery", lambda: False)
+    texts = [(f"t{n}", f"message number {n} goes here") for n in range(20)]
+    monkeypatch.setattr(typed, "for_day", lambda day, exclude=(): texts)
+    monkeypatch.setattr(grammar, "llm_available", lambda: True)
+    monkeypatch.setattr(grammar, "llm_check", lambda items, mode, **k: [
+        grammar.GrammarFinding("verb", f"mistake {label}", f"fix {label}", text, label, basis="llm", mode=mode)
+        for label, text in items])
+    assert cli.cmd_analyse_day(argparse.Namespace(day=str(date.today()), force=False)) == 0
+    shown = json.loads((config.REPORTS_DIR / f"{date.today()}-grammar.json").read_text())
+    assert len(shown) == 20

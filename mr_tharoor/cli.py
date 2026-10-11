@@ -317,10 +317,11 @@ def _analyse_day(args: argparse.Namespace) -> int:
         rows = [row for row in grammar.summarise(week, limit=200)
                 if row["times"] >= 2 or (row["kind"], row["said"], row["should_be"]) in today_keys]
         rows.sort(key=lambda r: ((r["kind"], r["said"], r["should_be"]) not in today_keys, -r["times"]))
-        # Capped per section, not overall: speech outnumbers typing most days,
-        # and a single global cap silently emptied the typing half of the page.
-        grammar_rows = ([r for r in rows if (r.get("mode") or "spoken") == "spoken"][:10]
-                        + grammar.typed_rows(rows, 6))
+        # Every mistake is shown. Capping at 10 spoken + 6 typed hid 30 of
+        # 36 corrections on 10 Oct without saying so; a correction you never
+        # see is one you cannot learn from.
+        grammar_rows = ([r for r in rows if (r.get("mode") or "spoken") == "spoken"]
+                        + grammar.typed_rows(rows))
         config.write_json_atomically(config.REPORTS_DIR / f"{when}-grammar.json", grammar_rows)
         analysis = {
             "version": report.ANALYSIS_VERSION, "completed_at": datetime.now().isoformat(),

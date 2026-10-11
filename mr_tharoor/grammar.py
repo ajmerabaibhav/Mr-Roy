@@ -359,7 +359,7 @@ TYPED_CAVEAT = ("This is typed, often into a terminal or a chat box, so missing 
 KINDS = {"article", "preposition", "number", "verb", "tense", "word-order", "pronoun", "phrase"}
 
 
-def typed_rows(rows: list[dict], limit: int) -> list[dict]:
+def typed_rows(rows: list[dict], limit: int | None = None) -> list[dict]:
     """The typing section, alternating chats with other apps' text boxes.
 
     A busy Claude Code day filled all six rows and hid every Gmail mistake

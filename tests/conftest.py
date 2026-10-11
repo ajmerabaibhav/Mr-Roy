@@ -8,7 +8,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from mr_tharoor import config, log, schedule, typed, wispr
+from mr_tharoor import config, log, report, schedule, textboxes, typed, wispr
 
 
 @pytest.fixture(autouse=True)
@@ -26,6 +26,22 @@ def isolated_data(tmp_path, monkeypatch):
     monkeypatch.setattr(typed, "CODEX_HISTORY", tmp_path / "codex-history.jsonl")
     monkeypatch.setenv("MR_THAROOR_NO_LLM", "1")
     monkeypatch.setattr(schedule, "LOG_DIR", tmp_path / "logs")
+    # Paths fixed at import, so redirected one by one: a test once deleted
+    # the real .accessibility-granted (10 Oct).
+    monkeypatch.setattr(textboxes, "GRANTED", tmp_path / "data" / ".accessibility-granted")
+    monkeypatch.setattr(schedule, "APP", tmp_path / "Mr Tharoor.app")
+    # The catch-up job hands off to the morning one, which opens the page:
+    # a test run opened a pytest report in the user's Safari (11 Oct).
+    monkeypatch.setattr(report, "open_report", lambda day=None: None)
+
+
+REAL_OPEN_REPORT = report.open_report
+
+
+@pytest.fixture
+def real_open_report(monkeypatch):
+    """For the one test of opening itself (it mocks the `open` command)."""
+    monkeypatch.setattr(report, "open_report", REAL_OPEN_REPORT)
 
 
 @pytest.fixture

@@ -55,7 +55,7 @@ def test_report_is_html_only(monkeypatch):
     assert not list(config.REPORTS_DIR.glob(f"{today}.pdf")) + list(config.REPORTS_DIR.glob(f"{today}.docx"))
 
 
-def test_open_report_opens_the_page(monkeypatch):
+def test_open_report_opens_the_page(monkeypatch, real_open_report):
     day = date.today() - timedelta(days=1)
     html_path = config.REPORTS_DIR / f"{day}.html"
     html_path.write_text("report")

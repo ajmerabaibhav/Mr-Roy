@@ -90,7 +90,7 @@ the day's sentences   Wispr's raw transcripts + what you typed
         ↓
 a few local rules      certain, free, never have an off night
         +
-two passes a night     batched calls to the CLI already installed here:
+one pass a night      batched calls to the CLI already installed here:
                        Claude Code (Haiku 5.5), or Codex (gpt-6-luna) if that is what you have
         ↓
 every correction must quote a span that is really in your text, or it is

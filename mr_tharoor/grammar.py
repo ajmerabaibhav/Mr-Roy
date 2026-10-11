@@ -325,8 +325,12 @@ def summarise(findings: list[GrammarFinding], limit: int = 8) -> list[dict]:
 LLM_CLI = os.environ.get("MR_THAROOR_LLM", "")  # claude | codex; empty = first one installed
 LLM_MODEL = os.environ.get("MR_THAROOR_LLM_MODEL", "")  # empty = haiku for claude, gpt-6-luna for codex
 LLM_BATCH = 20  # utterances per call
-LLM_PASSES = 2  # each batch is checked this many times and the corrections merged
-LLM_MAX_BATCHES = 12  # a day cannot cost more than this
+# MEASURED (11 Oct, Haiku 5.5, the real 10 Oct day, 4 runs): one pass caught
+# 27-29 of 33 mistakes (86%), two merged 93%. Haiku 4.5 had needed two (10, 13
+# and 15 on three runs, 8 Oct); 5.5 is steady enough for one, and the calls
+# saved go to checking more messages: 24 batches, the same 24-call ceiling.
+LLM_PASSES = 1  # each batch is checked this many times and the corrections merged
+LLM_MAX_BATCHES = 24  # a day cannot cost more than this: 480 messages per half
 LLM_TIMEOUT = 420  # seconds per call; the nightly job has all night
 
 PROMPT = """You are an exacting English teacher marking a fluent Indian English speaker's real {kind}. Each numbered item below is one {unit}.
@@ -624,9 +628,7 @@ def llm_check(items: list[tuple[str, str]], mode: str = "spoken", *, logger=None
             caveat=SPOKEN_CAVEAT if mode == "spoken" else TYPED_CAVEAT,
             items=listing,
         )
-        # MEASURED (8 Oct, the real 7 Oct day replayed): one pass found 10, 13
-        # and 15 corrections on three runs of the same text, each missing some
-        # the others caught. Two passes, merged, lose far less to one bad draw.
+        # LLM_PASSES > 1 merges several draws; see the measurement at LLM_PASSES.
         found, reply = [], ""
         for _ in range(LLM_PASSES):
             try:

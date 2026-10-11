@@ -83,30 +83,10 @@ APP_INFO = {
 
 
 def _icon_png() -> bytes:
-    """The welcome portrait (welcome.ART) on a cream square, 1024 px, as PNG.
-    Stdlib only: nearest-neighbour blocks need no imaging library."""
-    import struct
-    import zlib
+    """The app icon: the welcome portrait on a cream square, 1024 px."""
+    from .welcome import portrait_png
 
-    from .welcome import ART, PALETTE
-
-    size, scale = 1024, 32
-    background = (240, 233, 220)
-    left, top = (size - len(ART[0]) * scale) // 2, size - len(ART) * scale  # shoulders on the edge
-    rows = []
-    for y in range(size):
-        art = ART[(y - top) // scale] if y >= top else ""
-        row = bytearray(b"\0")
-        for x in range(size):
-            cell = art[(x - left) // scale] if art and 0 <= x - left < len(art) * scale else "."
-            row += bytes(PALETTE.get(cell, background))
-        rows.append(bytes(row))
-
-    def chunk(kind: bytes, data: bytes) -> bytes:
-        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
-
-    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 2, 0, 0, 0))
-            + chunk(b"IDAT", zlib.compress(b"".join(rows), 9)) + chunk(b"IEND", b""))
+    return portrait_png(1024, 32)
 
 
 def launcher() -> str | None:

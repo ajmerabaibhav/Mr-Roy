@@ -230,6 +230,7 @@ def build_html(day: date, grammar: list[dict] | None = None, analysis: dict | No
             '</div></div></div>'
         ))
         .replace("{{PORTRAIT}}", PORTRAIT)
+        .replace("{{FAVICON}}", _favicon())
         .replace("{{WEEK}}", _week_html(day))
         .replace("{{PROVENANCE}}", _provenance(analysis or {}))
         .replace("{{REMARK}}", html.escape(remark))
@@ -288,7 +289,17 @@ def latest_day(before: date | None = None) -> date | None:
     return None
 
 
+def _favicon() -> str:
+    """The tab icon: the app icon's portrait at 64 px (Safari showed a compass)."""
+    import base64
+
+    from .welcome import portrait_png
+
+    return base64.b64encode(portrait_png(64, 2)).decode()
+
+
 TEMPLATE = """<!doctype html><html><head><meta charset="utf-8">
+<link rel="icon" type="image/png" href="data:image/png;base64,{{FAVICON}}">
 <title>Mr Tharoor - {{DATE}}</title><style>
 /* A lesson sheet, not a dashboard. Light paper because this is printed and
    read; serif because it is a teacher's page. Fonts are the ones macOS

@@ -49,6 +49,31 @@ PALETTE = {
 }
 
 
+def portrait_png(size: int, scale: int) -> bytes:
+    """The portrait as a square PNG on cream, shoulders on the bottom edge.
+    The app icon (1024, 32) and the report's tab icon (64, 2). Stdlib only:
+    nearest-neighbour blocks need no imaging library."""
+    import struct
+    import zlib
+
+    background = (240, 233, 220)
+    left, top = (size - len(ART[0]) * scale) // 2, size - len(ART) * scale
+    rows = []
+    for y in range(size):
+        art = ART[(y - top) // scale] if y >= top else ""
+        row = bytearray(b"\0")
+        for x in range(size):
+            cell = art[(x - left) // scale] if art and 0 <= x - left < len(art) * scale else "."
+            row += bytes(PALETTE.get(cell, background))
+        rows.append(bytes(row))
+
+    def chunk(kind: bytes, data: bytes) -> bytes:
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
+
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 2, 0, 0, 0))
+            + chunk(b"IDAT", zlib.compress(b"".join(rows), 9)) + chunk(b"IEND", b""))
+
+
 def _colour() -> bool:
     return sys.stdout.isatty() and not os.environ.get("NO_COLOR")
 

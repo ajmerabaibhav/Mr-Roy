@@ -10,6 +10,15 @@ The page capped corrections at 10 from speech and 6 from typing, without
 saying so: on 10 Oct it showed 6 of 36. The cap is gone; 10 Oct re-run shows
 all 37 plus one repeat from history. Test: `test_every_mistake_reaches_the_page`.
 
+One grammar pass instead of two. Measured on Haiku 5.5 over the real 10 Oct
+day, four runs: one pass caught 27-29 of 33 distinct mistakes (86%), two
+merged 93%. `grammar_eval` on one pass: 9, 10 and 10 of 10 over three runs,
+0/6 false alarms. The calls saved raise the daily ceiling from 240 to 480
+messages per half at the same 24-call cost.
+
+The report page has a tab icon: the app icon's portrait at 64 px, so Safari
+no longer shows its compass placeholder.
+
 ## Setup asks nothing; the page opens when it is ready — 10 October 2026
 
 - `tharoor setup` no longer asks the two consent questions. It tells you two

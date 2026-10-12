@@ -135,8 +135,8 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
     print(f"\n  {bold}Ready.{reset} He runs in the background and starts on every login.")
     print(f"  {dim}23:30 he checks the day. 08:30 the lesson opens by itself.{reset}\n")
-    print(f"    roy          {dim}what he does and what is running{reset}")
-    print(f"    roy logs     {dim}what the background jobs did{reset}\n")
+    print(f"    roy        {dim}what he does and what is running{reset}")
+    print(f"    roy logs   {dim}what the background jobs did{reset}\n")
     return 0
 
 

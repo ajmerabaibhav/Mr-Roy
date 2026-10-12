@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 124 124" role="img" aria-label="Mr Tharoor">
-<defs><clipPath id="tharoor-face"><circle cx="62" cy="62" r="58"/></clipPath></defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 124 124" role="img" aria-label="Mr Roy">
+<defs><clipPath id="roy-face"><circle cx="62" cy="62" r="58"/></clipPath></defs>
 <circle cx="62" cy="62" r="58" fill="#F4EEE2"/>
-<g clip-path="url(#tharoor-face)"><g transform="translate(8 6)" stroke="#1F1A17" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round">
+<g clip-path="url(#roy-face)"><g transform="translate(8 6)" stroke="#1F1A17" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round">
     <path d="M-4 124C-2 94 14 82 36 77L54 82L72 77C94 82 110 94 112 124Z" fill="#C9B6E4"/>
   <path d="M47 64L47 76Q54 80 61 76L61 64Z" fill="#B07450"/>
   <path d="M45 74Q54 81 63 74L64 79Q54 86 44 79Z" fill="#C9B6E4"/>

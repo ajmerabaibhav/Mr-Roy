@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from mr_tharoor import cli, config, report, schedule
+from mr_roy import cli, config, report, schedule
 
 
 def test_install_rejects_false_success_from_launchctl(tmp_path, monkeypatch):

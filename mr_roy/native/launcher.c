@@ -1,9 +1,9 @@
-// Mr Tharoor.app/Contents/MacOS/MrTharoor: runs `tharoor listen` as a child.
+// Mr Roy.app/Contents/MacOS/MrRoy: runs `roy listen` as a child.
 //
 // macOS lists an Accessibility grant under the app responsible for the
 // process. Started by launchd as plain Python, that was "python3.12". Started
 // by this stub inside an app bundle, the child is the app's responsibility,
-// so System Settings and the permission prompt say "Mr Tharoor".
+// so System Settings and the permission prompt say "Mr Roy".
 //
 // It only spawns argv[1..], forwards stop signals, and exits with the
 // child's status, so launchd's KeepAlive sees exactly what the child did.
@@ -23,7 +23,7 @@ static void forward(int sig) {
 
 int main(int argc, char **argv) {
     if (argc < 2) {
-        fprintf(stderr, "usage: MrTharoor /path/to/command [args]\n");
+        fprintf(stderr, "usage: MrRoy /path/to/command [args]\n");
         return 2;
     }
     signal(SIGTERM, forward);

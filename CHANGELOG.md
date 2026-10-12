@@ -4,6 +4,17 @@ What changed, when, and what was measured. Newest first.
 The current state of the project is in [README.md](README.md); what is still
 broken or deferred is in [TODOS.md](TODOS.md).
 
+## Renamed: Mr Roy — 12 October 2026
+
+The project was called Mr Tharoor. A product named after a living public
+figure, with a portrait in his manner, read as an endorsement he never gave,
+and Indian courts protect personality rights. Everything is now Mr Roy: the
+`roy` command, the `mr_roy` package, `MR_ROY_*` settings, `com.mrroy.*`
+background jobs, `Mr Roy.app`, `~/mr-roy` and the Mr-Roy repository. The
+tribute notes are gone from the README and the report. Moving an existing
+install: `tharoor install --remove`, rename the folder to `~/mr-roy`,
+`pip install -e .`, `roy setup`, and grant Accessibility to Mr Roy.
+
 ## Every mistake on the page — 11 October 2026
 
 The page capped corrections at 10 from speech and 6 from typing, without
@@ -21,11 +32,11 @@ no longer shows its compass placeholder.
 
 ## Setup asks nothing; the page opens when it is ready — 10 October 2026
 
-- `tharoor setup` no longer asks the two consent questions. It tells you two
+- `roy setup` no longer asks the two consent questions. It tells you two
   things: allow Accessibility, and the day's sentences go to your Claude Code
   or Codex CLI once a night. Claude Code and Codex chats are always read. A No
   to the grammar question left a few local rules, which is no product; an old
-  `data/consent.json` is now ignored. `MR_THAROOR_NO_LLM=1` still turns the
+  `data/consent.json` is now ignored. `MR_ROY_NO_LLM=1` still turns the
   call off.
 - The catch-up job opens yesterday's page itself the moment it finishes. On
   10 Oct the lid was shut overnight, the analysis finished at 12:35, and the
@@ -33,12 +44,12 @@ no longer shows its compass placeholder.
 - Setup asks macOS for Accessibility by itself: the background listener
   raises the prompt (from Terminal it would name Terminal, the wrong app),
   setup opens the Settings page and waits, and the listener restarts itself
-  the moment it is switched on. Setup output restyled to match `tharoor`.
-  `tharoor install` retries the launchd bootstrap that failed with "5:
+  the moment it is switched on. Setup output restyled to match `roy`.
+  `roy install` retries the launchd bootstrap that failed with "5:
   Input/output error" right after a bootout.
-- The listener runs inside `Mr Tharoor.app` (a 40-line C stub, ad-hoc
+- The listener runs inside `Mr Roy.app` (a 40-line C stub, ad-hoc
   signed, his portrait as the icon, all built at install with clang,
-  iconutil and codesign), so Accessibility lists "Mr Tharoor", not
+  iconutil and codesign), so Accessibility lists "Mr Roy", not
   "python3.12". A grant only reaches a process started after it (measured:
   granted, polled AXIsProcessTrusted, stayed false; a restart saw it), so
   setup restarts the listener while waiting, and an ungranted listener
@@ -51,7 +62,7 @@ no longer shows its compass placeholder.
 
 ## Grammar only: pronunciation removed — 9 October 2026
 
-Pronunciation was never shown to work on a real voice: `tharoor check` was
+Pronunciation was never shown to work on a real voice: `roy check` was
 never run, and most nights it found zero or one sound. Shipping it meant
 leading with a claim nobody had measured, and it carried the whole install
 cost (torch, transformers, faster-whisper, a 1.3 GB model download). So it is
@@ -63,7 +74,7 @@ own-microphone listener and its mic tests.
   `analyse`, `mictest`, `selftest`, `remind`, `gate`, `cache`.
 - Dependencies: eleven down to one (`pyobjc-framework-ApplicationServices`).
 - Wispr is read as text only; its audio column is no longer selected or required.
-- `tharoor listen` now only runs the text-box reader.
+- `roy listen` now only runs the text-box reader.
 - The page is the lesson: corrections from speech and typing, the week strip,
   and the processing summary. No audio is embedded.
 - Retention (`config.purge_expired`) now covers reports and typed text only.
@@ -90,7 +101,7 @@ comparing against that would show a collapse that never happened), the count is
 always divided by how much you actually produced, and a difference smaller than
 twice the combined standard error is reported as no difference at all.
 
-**A portrait.** Mr Tharoor is drawn in inline SVG — a fictional professor,
+**A portrait.** Mr Roy is drawn in inline SVG — a fictional professor,
 spectacles and a band collar, not a likeness of anyone living — so the page
 stays one self-contained file that prints in ink.
 
@@ -106,7 +117,7 @@ sentence it came from. The lesson comes before the pronunciation section, since
 that is where the material usually is, and the opening line says how many
 corrections there are and which half of the day they came from.
 
-The command is `tharoor`.
+The command is `roy`.
 
 
 ## Grammar that finds things, and the typing half — 22 September 2026
@@ -132,7 +143,7 @@ said, and what you typed.
 
 **This is a change of posture and it is stated plainly.** Text now leaves the
 laptop, for that one call. Audio still never does. Most of the text in question
-was dictated or typed into Claude to begin with. `MR_THAROOR_NO_LLM=1` turns it
+was dictated or typed into Claude to begin with. `MR_ROY_NO_LLM=1` turns it
 off and leaves the old local rules; without the Claude CLI on PATH, grammar
 falls back to them automatically.
 
@@ -144,9 +155,9 @@ the audio is 4.5x quieter, and there is no speaker filter.
 
 ## Automation and PDF recovery - 21 September 2026
 
-`tharoor install` now targets the macOS desktop login session explicitly and
+`roy install` now targets the macOS desktop login session explicitly and
 verifies each service after loading it. An unsuccessful installation exits
-with an error. `tharoor install --status` reports each service's actual state,
+with an error. `roy install --status` reports each service's actual state,
 PID when running, and any unsuccessful last exit. A plist on disk alone does
 not mean the service is running.
 
@@ -166,9 +177,9 @@ To investigate a missing report, use the Python environment where the project
 is installed:
 
 ```bash
-tharoor install --status
-tharoor logs
-tharoor analyse-pending --force
+roy install --status
+roy logs
+roy analyse-pending --force
 ```
 
 The morning job opens the PDF in Preview and the interactive HTML review in
@@ -195,7 +206,7 @@ The speech-to-report pipeline now abstains when recognition is uncertain:
 - Grammar uses a small set of explicit local rules, plus isolated changes you
   made by hand. Model rewrites such as `kindly → please`, `prepone → bring
   forward`, and `the same → it` are not grammar judgements.
-- `tharoor check` plays your own clip and the reference. Answering `n` excludes
+- `roy check` plays your own clip and the reference. Answering `n` excludes
   that day's word/sound from future evidence, reports, and reminders.
 
 The latest reference test produced **0 flags in 118 usable sound opportunities
@@ -203,7 +214,7 @@ across 86 cached reference recordings**. This does not measure recall or
 accuracy on your connected speech. Model scores are not calibrated probabilities
 that you made a mistake. The historical experiments below predate this update.
 
-`tharoor install` updates the three existing launch agents. Analysis checks
+`roy install` updates the three existing launch agents. Analysis checks
 every 15 minutes while awake and at login, catches up the last three days,
 and processes the current day after 23:30. Scheduled analysis also runs on
 battery; it does not request a wake lock. The morning job retries until a
@@ -222,7 +233,7 @@ voice from other speakers, and its previous shared voice-processing path
 degraded calls. Reading detection is a heuristic based on the foreground app,
 output audio, and sampled speech; it cannot know which text you are reading.
 
-From the same Python environment that installed Mr Tharoor, install the dev
+From the same Python environment that installed Mr Roy, install the dev
 extras once with `python -m pip install -e '.[dev]'`, then run the automated
 checks with `python -m pytest tests -q`. The tests isolate the user's data and
 mock capture. The explicit hardware check is separate:
@@ -232,7 +243,7 @@ A pronunciation and phrasing coach that listens to how you actually talk, and
 each morning greets you with the words you got wrong, your own voice next to a
 recording of them said properly, and the phrases you keep getting backwards.
 
-Mr Tharoor is an old-school Indian professor of English: courteous, exacting,
+Mr Roy is an old-school Indian professor of English: courteous, exacting,
 fond of a long word where a long word is warranted, and entirely without
 condescension. He corrects the way a good teacher does, by showing you the
 thing and trusting your ear to do the rest.
@@ -251,5 +262,5 @@ one second.
 macOS only. No audio ever leaves the laptop and no API key is needed. Two
 things do go out: a human recording of a word, fetched the first time it is
 flagged, and the day's transcripts, sent to the Claude Code CLI for the grammar
-pass — which `MR_THAROOR_NO_LLM=1` switches off.
+pass — which `MR_ROY_NO_LLM=1` switches off.
 

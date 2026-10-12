@@ -11,7 +11,7 @@ plain text. So this reads that, and only that.
 
 What is deliberately excluded: pasted blocks, slash commands, shell
 passthroughs, tool results, system reminders, and anything under a project
-folder belonging to Mr Tharoor itself -- the grammar checker is Claude Code,
+folder belonging to Mr Roy itself -- the grammar checker is Claude Code,
 its own prompts land in a transcript, and without that filter tonight's
 prompt becomes tomorrow's homework.
 
@@ -105,7 +105,7 @@ def for_day(day: date, exclude: list[str] | None = None) -> list[tuple[str, str]
         out.append((label, text))
 
     for transcript in sorted(PROJECTS.glob("*/*.jsonl")):
-        if "mr-tharoor" in transcript.parent.name or "mr_tharoor" in transcript.parent.name:
+        if "mr-roy" in transcript.parent.name or "mr_roy" in transcript.parent.name:
             continue
         if datetime.fromtimestamp(transcript.stat().st_mtime).date() < day - timedelta(days=1):
             continue  # nothing written on or after the day in question, with a

@@ -7,7 +7,7 @@ Usage: python tests/grammar_eval.py old [runs]       the prompt in grammar.py
 """
 import sys, time
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parents[1]))
-from mr_tharoor import grammar
+from mr_roy import grammar
 
 # (text, words that must appear in some should_be, or None = must not be marked at all)
 CASES = [

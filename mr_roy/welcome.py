@@ -1,4 +1,4 @@
-"""What `tharoor` on its own prints: who he is, what he does, what is running.
+"""What `roy` on its own prints: who he is, what he does, what is running.
 
 The portrait is pixel art drawn with half blocks: each character cell is two
 pixels, the top one in the foreground colour and the bottom in the background,
@@ -101,10 +101,10 @@ def _status() -> list[tuple[bool, str, str]]:
 
     rows = []
     try:
-        running = schedule.service_state("com.tharoor.listen").get("state") == "running"
+        running = schedule.service_state("com.mrroy.listen").get("state") == "running"
     except Exception:  # noqa: BLE001
         running = False
-    rows.append((bool(running), "background", "running" if running else "not set up: run tharoor setup"))
+    rows.append((bool(running), "background", "running" if running else "not set up: run roy setup"))
     try:
         latest = wispr.health().get("latest") if wispr.available() else None
     except Exception:  # noqa: BLE001
@@ -123,7 +123,7 @@ def show() -> int:
         else ("",) * 5
     beside = [
         "",
-        f"{bold}Mr Tharoor{reset}",
+        f"{bold}Mr Roy{reset}",
         "Your English teacher, in the terminal.",
         "",
         "He reads what you type and what you",
@@ -151,12 +151,12 @@ def show() -> int:
 
     print(f"\n  {bold}Commands{reset}")
     for command, what in (
-        ("tharoor setup", "first time? start here"),
-        ("tharoor morning", "open the latest lesson"),
-        ("tharoor analyse-day", "run tonight's check now"),
-        ("tharoor logs", "what the background jobs did"),
-        ("tharoor install --remove", "stop everything"),
-        ("tharoor --help", "every command"),
+        ("roy setup", "first time? start here"),
+        ("roy morning", "open the latest lesson"),
+        ("roy analyse-day", "run tonight's check now"),
+        ("roy logs", "what the background jobs did"),
+        ("roy install --remove", "stop everything"),
+        ("roy --help", "every command"),
     ):
         print(f"    {command:<27}{dim}{what}{reset}")
 

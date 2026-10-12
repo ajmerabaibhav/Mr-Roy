@@ -33,10 +33,10 @@ ANALYSIS_VERSION = 2
 # An old-school English teacher: swept-back hair going silver at the temples,
 # a warm smile, a light purple kurta. Fixed colours, so it reads the same in
 # light and dark mode.
-PORTRAIT = """<svg class="portrait" viewBox="0 0 124 124" role="img" aria-label="Mr Tharoor">
-<defs><clipPath id="tharoor-face"><circle cx="62" cy="62" r="58"/></clipPath></defs>
+PORTRAIT = """<svg class="portrait" viewBox="0 0 124 124" role="img" aria-label="Mr Roy">
+<defs><clipPath id="roy-face"><circle cx="62" cy="62" r="58"/></clipPath></defs>
 <circle cx="62" cy="62" r="58" fill="#F4EEE2"/>
-<g clip-path="url(#tharoor-face)"><g transform="translate(8 6)" stroke="#1F1A17" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round">
+<g clip-path="url(#roy-face)"><g transform="translate(8 6)" stroke="#1F1A17" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round">
     <path d="M-4 124C-2 94 14 82 36 77L54 82L72 77C94 82 110 94 112 124Z" fill="#C9B6E4"/>
   <path d="M47 64L47 76Q54 80 61 76L61 64Z" fill="#B07450"/>
   <path d="M45 74Q54 81 63 74L64 79Q54 86 44 79Z" fill="#C9B6E4"/>
@@ -59,7 +59,7 @@ PORTRAIT = """<svg class="portrait" viewBox="0 0 124 124" role="img" aria-label=
 </svg>"""
 
 
-# Mr Tharoor is an old-school Indian professor of English: courteous, exacting,
+# Mr Roy is an old-school Indian professor of English: courteous, exacting,
 # fond of a long word where a long word is warranted, and entirely without
 # condescension. He corrects the way a good teacher does, by showing you the
 # thing and trusting you to hear it.
@@ -169,7 +169,7 @@ def _provenance(analysis: dict) -> str:
     return ('<div class="tribute">'
             f"Grammar was checked by the {'Codex' if engine == 'codex-cli' else 'Claude Code'} CLI "
             "already installed here, which means the day's "
-            'transcript text was sent for that one call. Set MR_THAROOR_NO_LLM=1 to use local rules '
+            'transcript text was sent for that one call. Set MR_ROY_NO_LLM=1 to use local rules '
             'instead.</div>')
 
 
@@ -300,7 +300,7 @@ def _favicon() -> str:
 
 TEMPLATE = """<!doctype html><html><head><meta charset="utf-8">
 <link rel="icon" type="image/png" href="data:image/png;base64,{{FAVICON}}">
-<title>Mr Tharoor - {{DATE}}</title><style>
+<title>Mr Roy - {{DATE}}</title><style>
 /* A lesson sheet, not a dashboard. Light paper because this is printed and
    read; serif because it is a teacher's page. Fonts are the ones macOS
    already has, so the file stays offline and self-contained. */
@@ -377,7 +377,7 @@ border-top:1px solid var(--rule)}
 body{padding:0 0 12px;font-size:11.5pt}.wrap{max-width:none}
 .sect{break-after:avoid}.card,.item{break-inside:avoid}}
 </style></head><body><div class="wrap">
-<div class="masthead">{{PORTRAIT}}<h1>Mr Tharoor</h1></div><div class="rule-thin"></div>
+<div class="masthead">{{PORTRAIT}}<h1>Mr Roy</h1></div><div class="rule-thin"></div>
 <div class="sub">{{DATE}} &middot; a lesson made from what you said and what you wrote</div>
 <div class="greet">{{GREETING}}</div>
 <div class="remark">{{REMARK}}</div>
@@ -386,7 +386,4 @@ body{padding:0 0 12px;font-size:11.5pt}.wrap{max-width:none}
 {{GRAMMAR}}
 {{SUMMARY}}
 {{PROVENANCE}}
-<div class="tribute">Mr Tharoor is a fictional mascot, named in tribute to Dr Shashi Tharoor.
-This software is not affiliated with, endorsed by, or connected to him. Every word it speaks
-was written for this program.</div>
 </div></body></html>"""

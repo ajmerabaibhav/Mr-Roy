@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="docs/tharoor.svg" width="112" alt="Mr Tharoor">
+<img src="docs/roy.svg" width="112" alt="Mr Roy">
 
-# Mr Tharoor
+# Mr Roy
 
 **An English teacher who reads how you write and what you dictate, then hands you a grammar lesson every morning.**
 
@@ -38,11 +38,11 @@ macOS. He never opens your microphone and never touches audio.
 ## Install
 
 ```bash
-git clone https://github.com/ajmerabaibhav/Mr-Tharoor.git mr-tharoor
-cd mr-tharoor && pip install -e . && tharoor setup
+git clone https://github.com/ajmerabaibhav/Mr-Roy.git mr-roy
+cd mr-roy && pip install -e . && roy setup
 ```
 
-`tharoor setup` checks the machine, says what he reads, starts three
+`roy setup` checks the machine, says what he reads, starts three
 background jobs and asks macOS for Accessibility. One small dependency, no
 model download. Then type and dictate normally. That is the whole interaction.
 
@@ -55,10 +55,10 @@ model download. Then type and dictate normally. That is the whole interaction.
   and signed in (`claude auth status`, `codex login status`), and says how to
   fix it if not. Without one, only a few local rules run.
 - **Accessibility.** The background job runs inside a small app,
-  `Mr Tharoor.app` (built on your Mac from `mr_tharoor/native/launcher.c`,
-  with his portrait as its icon), so macOS asks for **Mr Tharoor**, not
+  `Mr Roy.app` (built on your Mac from `mr_roy/native/launcher.c`,
+  with his portrait as its icon), so macOS asks for **Mr Roy**, not
   Python. Setup opens System Settings at the right page and waits; switch on
-  Mr Tharoor and setup says so within seconds. Skip it and Wispr and the
+  Mr Roy and setup says so within seconds. Skip it and Wispr and the
   chats still work; switch it on later and he picks it up within 10 minutes.
   No Xcode command line tools? He runs as plain Python and macOS names that
   instead.
@@ -71,9 +71,9 @@ model download. Then type and dictate normally. That is the whole interaction.
 3. **08:30** a page opens in your browser: each mistake, the correct version,
    and one word on why.
 
-Type `tharoor` on its own any time to see what he does and what is running:
+Type `roy` on its own any time to see what he does and what is running:
 
-<img src="docs/terminal.png" width="640" alt="tharoor in the terminal: the pixel-art portrait, what he does, live status and commands">
+<img src="docs/terminal.png" width="640" alt="roy in the terminal: the pixel-art portrait, what he does, live status and commands">
 
 ## What he reads
 
@@ -101,13 +101,13 @@ dropped. Nothing else stands between you and an invented mistake.
 
 | | |
 |---|---|
-| `tharoor` | who he is, what he does, and what is running right now |
-| `tharoor listen` | the background job: reads your typing. Never opens the microphone |
-| `tharoor analyse-day` | run tonight's job now |
-| `tharoor morning` | open the latest lesson |
-| `tharoor logs` | what the scheduled jobs actually did |
-| `tharoor install --status` | are the three agents really running |
-| `tharoor install --remove` | stop all of it |
+| `roy` | who he is, what he does, and what is running right now |
+| `roy listen` | the background job: reads your typing. Never opens the microphone |
+| `roy analyse-day` | run tonight's job now |
+| `roy morning` | open the latest lesson |
+| `roy logs` | what the scheduled jobs actually did |
+| `roy install --status` | are the three agents really running |
+| `roy install --remove` | stop all of it |
 
 ## What he will not claim
 
@@ -121,8 +121,8 @@ dropped. Nothing else stands between you and an invented mistake.
   quiet page means "nothing he could prove", not "perfect English".
 - **Text leaves the machine once a night** for the grammar call.
   It uses the Claude Code CLI, or OpenAI's Codex CLI if that is what you have
-  (`MR_THAROOR_LLM=codex` to choose it when both are installed).
-  `MR_THAROOR_NO_LLM=1` turns that off and falls back to local rules.
+  (`MR_ROY_LLM=codex` to choose it when both are installed).
+  `MR_ROY_NO_LLM=1` turns that off and falls back to local rules.
   To keep that text out of model training, on a personal plan turn off "Help improve Claude" at
   claude.ai/settings/data-privacy-controls, or "Improve the model for
   everyone" in ChatGPT → Settings → Data controls (it covers Codex too).
@@ -145,12 +145,6 @@ pip install -e '.[dev]' && python3 -m pytest tests -q
 ```
 
 ---
-
-> **A tribute, not an association.** The name and manner are an affectionate
-> nod to Dr Shashi Tharoor. This project is **not affiliated with, endorsed by,
-> or connected to him in any way**, the character is a fictional mascot, and
-> the drawing is nobody's likeness. If any objection is ever raised, the name
-> will be changed without argument.
 
 What changed and what was measured: [CHANGELOG.md](CHANGELOG.md).
 What is still broken: [TODOS.md](TODOS.md). MIT.

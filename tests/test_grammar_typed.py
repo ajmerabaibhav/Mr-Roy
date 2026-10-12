@@ -5,7 +5,7 @@ from datetime import date, datetime, timezone
 
 import pytest
 
-from mr_tharoor import grammar, typed
+from mr_roy import grammar, typed
 
 ITEMS = [("a", "the result which you have gave is not new"),
          ("b", "can you check the people that is building it")]
@@ -68,7 +68,7 @@ def test_typed_reads_only_what_a_person_typed(tmp_path, monkeypatch):
         "{ broken json",
     ]) + "\n")
     # A transcript belonging to this project is our own grammar call coming back.
-    ours = tmp_path / "-Users-someone-mr-tharoor-data-llm"
+    ours = tmp_path / "-Users-someone-mr-roy-data-llm"
     ours.mkdir()
     (ours / "s.jsonl").write_text(row("this prompt was written by the checker itself") + "\n")
 
@@ -79,9 +79,9 @@ def test_typed_reads_only_what_a_person_typed(tmp_path, monkeypatch):
 
 def test_llm_is_optional(monkeypatch):
     monkeypatch.setattr(grammar, "llm_binary", lambda: "/bin/echo")
-    monkeypatch.delenv("MR_THAROOR_NO_LLM", raising=False)
+    monkeypatch.delenv("MR_ROY_NO_LLM", raising=False)
     assert grammar.llm_available()
-    monkeypatch.setenv("MR_THAROOR_NO_LLM", "1")
+    monkeypatch.setenv("MR_ROY_NO_LLM", "1")
     assert not grammar.llm_available()
     assert grammar.llm_check(ITEMS) == []  # and nothing is spawned
 
@@ -99,7 +99,7 @@ def test_week_refuses_to_invent_progress(tmp_path, monkeypatch):
     import json as _json
     from datetime import date, timedelta
 
-    from mr_tharoor import config, progress
+    from mr_roy import config, progress
 
     today = date(2026, 9, 22)
     for back, engine, found in ((1, "claude-cli", 6), (9, "local-rules", 0)):
@@ -120,7 +120,7 @@ def test_week_refuses_to_invent_progress(tmp_path, monkeypatch):
 def _seed(day, engine="claude-cli", version=2, found=0, label="agreement"):
     import json as _json
 
-    from mr_tharoor import config
+    from mr_roy import config
 
     (config.REPORTS_DIR / f"{day}-analysis.json").write_text(
         _json.dumps({"grammar_engine": engine, "version": version}))
@@ -132,7 +132,7 @@ def test_a_percentage_never_survives_a_verdict_of_no_difference(monkeypatch):
     """The number and the sentence must agree, or the sentence is worthless."""
     from datetime import date, timedelta
 
-    from mr_tharoor import progress
+    from mr_roy import progress
 
     today = date(2026, 10, 20)
     for back in range(1, 15):
@@ -147,7 +147,7 @@ def test_a_percentage_never_survives_a_verdict_of_no_difference(monkeypatch):
 def test_an_older_analysis_layout_is_not_pooled_in(monkeypatch):
     from datetime import date, timedelta
 
-    from mr_tharoor import progress
+    from mr_roy import progress
 
     today = date(2026, 10, 20)
     for back in range(1, 8):
@@ -159,7 +159,7 @@ def test_an_older_analysis_layout_is_not_pooled_in(monkeypatch):
 def test_the_footer_does_not_claim_corrections_with_no_words(monkeypatch):
     from datetime import date, timedelta
 
-    from mr_tharoor import progress, report
+    from mr_roy import progress, report
 
     today = date(2026, 10, 20)
     for back in range(1, 8):
@@ -172,7 +172,7 @@ def test_the_footer_does_not_claim_corrections_with_no_words(monkeypatch):
 
 def test_the_certain_rules_run_beside_the_model_without_repeating_it():
     """A rule never has an off night, but it must not say what was already said."""
-    from mr_tharoor.grammar import GrammarFinding
+    from mr_roy.grammar import GrammarFinding
 
     llm = [GrammarFinding("phrase", "revert back to me", "reply to me", "ctx", "u1",
                           basis="llm", mode="spoken")]
@@ -204,7 +204,7 @@ def test_codex_is_used_when_claude_is_missing(monkeypatch, tmp_path):
     monkeypatch.setattr(grammar, "LLM_CLI", "")
     monkeypatch.setattr(grammar.shutil, "which", lambda name: str(codex) if name == "codex" else None)
     monkeypatch.setattr(grammar.os, "access", lambda path, mode: str(path) == str(codex))
-    monkeypatch.delenv("MR_THAROOR_NO_LLM", raising=False)
+    monkeypatch.delenv("MR_ROY_NO_LLM", raising=False)
     assert grammar.llm_name() == "codex"
     found = grammar.llm_check([("s1", "thank you for the result you have gave me today")], "typed")
     assert [(f.said, f.should_be) for f in found] == [("you have gave", "you have given")]
@@ -254,7 +254,7 @@ def test_text_box_mistakes_are_not_crowded_out_by_chats():
 def test_text_box_sentence_already_in_a_chat_is_counted_once(tmp_path, monkeypatch):
     # 6 Oct: the Claude app's box and its transcript both held one message,
     # and its single mistake showed as "2 times".
-    from mr_tharoor import textboxes
+    from mr_roy import textboxes
 
     message = "can you check that wether this thing i can isntalled in a smart kiosk or not"
     folder = tmp_path / "proj"

@@ -10,15 +10,15 @@ and nothing needs a daemon sitting awake.
 
 Three agents, deliberately separate so one failing never takes the others out:
 
-    com.tharoor.listen    at login, stays resident, reads the text box you
+    com.mrroy.listen    at login, stays resident, reads the text box you
                         are typing in. Restarted if it dies, throttled so a
                         crash loop cannot spin the CPU.
-    com.tharoor.nightly   23:30 and every 15 minutes while awake, catches up
+    com.mrroy.nightly   23:30 and every 15 minutes while awake, catches up
                         retained days. Does not request a wake lock.
-    com.tharoor.morning   08:30, opens the report.
+    com.mrroy.morning   08:30, opens the report.
 
 Every agent runs as you, in your login session. Nothing installs to /Library,
-nothing needs sudo, nothing runs as root. Removing it is `tharoor uninstall`, and
+nothing needs sudo, nothing runs as root. Removing it is `roy uninstall`, and
 what that removes is three files in ~/Library/LaunchAgents.
 """
 
@@ -40,13 +40,13 @@ AGENTS_DIR = Path.home() / "Library" / "LaunchAgents"
 LOG_DIR = config.ROOT / "logs"
 
 JOBS = {
-    "com.tharoor.listen": {
+    "com.mrroy.listen": {
         "args": ["listen"],
         "resident": True,  # starts at login and stays up
         "battery_safe": True,
         "what": "reads your typing, all day",
     },
-    "com.tharoor.nightly": {
+    "com.mrroy.nightly": {
         "args": ["analyse-pending", "--force"],
         "hour": 23,
         "minute": 30,
@@ -54,7 +54,7 @@ JOBS = {
         "battery_safe": True,  # no wake assertion; catches up while the Mac is awake
         "what": "check the day's grammar",
     },
-    "com.tharoor.morning": {
+    "com.mrroy.morning": {
         "args": ["morning", "--automatic"],
         "hour": 8,
         "minute": 30,
@@ -65,18 +65,18 @@ JOBS = {
 }
 
 
-def _tharoor() -> list[str]:
+def _roy() -> list[str]:
     """The installed command, resolved now rather than guessed at run time."""
-    found = shutil.which("tharoor")
+    found = shutil.which("roy")
     if found:
         return [found]
-    return [sys.executable, "-m", "mr_tharoor.cli"]
+    return [sys.executable, "-m", "mr_roy.cli"]
 
 
-APP = config.ROOT / "Mr Tharoor.app"
+APP = config.ROOT / "Mr Roy.app"
 APP_INFO = {
-    "CFBundleName": "Mr Tharoor", "CFBundleDisplayName": "Mr Tharoor",
-    "CFBundleIdentifier": "com.tharoor.app", "CFBundleExecutable": "MrTharoor",
+    "CFBundleName": "Mr Roy", "CFBundleDisplayName": "Mr Roy",
+    "CFBundleIdentifier": "com.mrroy.app", "CFBundleExecutable": "MrRoy",
     "CFBundlePackageType": "APPL", "CFBundleVersion": "1", "LSUIElement": True,
     "CFBundleIconFile": "AppIcon",
 }
@@ -90,8 +90,8 @@ def _icon_png() -> bytes:
 
 
 def launcher() -> str | None:
-    """Build Mr Tharoor.app once; the listener runs inside it so macOS names
-    the Accessibility grant "Mr Tharoor", not "python3.12" (native/launcher.c).
+    """Build Mr Roy.app once; the listener runs inside it so macOS names
+    the Accessibility grant "Mr Roy", not "python3.12" (native/launcher.c).
 
     Built only when missing or its source, icon or Info.plist changed: a
     rebuilt app is a new identity to macOS, and the grant must be given again. None when
@@ -101,7 +101,7 @@ def launcher() -> str | None:
     import hashlib
 
     source = Path(__file__).with_name("native") / "launcher.c"
-    binary = APP / "Contents" / "MacOS" / "MrTharoor"
+    binary = APP / "Contents" / "MacOS" / "MrRoy"
     stamp = APP / "Contents" / "Resources" / "source.sha256"
     icon = _icon_png()
     digest = hashlib.sha256(source.read_bytes() + icon + plistlib.dumps(APP_INFO)).hexdigest()
@@ -132,7 +132,7 @@ def launcher() -> str | None:
 
 def plist_for(label: str, job: dict) -> dict:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
-    command = _tharoor() + list(job["args"])
+    command = _roy() + list(job["args"])
     if job.get("resident"):
         app = launcher()
         command = ([app] if app else []) + command
@@ -148,7 +148,7 @@ def plist_for(label: str, job: dict) -> dict:
         # captured four real chunks, was signalled, exited 0, and stayed down.
         #
         # True means always bring it back. Stopping it deliberately is
-        # `tharoor install --remove`, which unloads the job so there is nothing
+        # `roy install --remove`, which unloads the job so there is nothing
         # left to restart. ThrottleInterval keeps a crash loop from spinning
         # the CPU.
         schedule["RunAtLoad"] = True
@@ -173,7 +173,7 @@ def plist_for(label: str, job: dict) -> dict:
         "LowPriorityIO": True,
         "Nice": 5,  # never compete with whatever you are actually doing
         "ProcessType": "Background",
-        "EnvironmentVariables": {"MR_THAROOR_HOME": str(config.ROOT), "PYTHONUNBUFFERED": "1"},
+        "EnvironmentVariables": {"MR_ROY_HOME": str(config.ROOT), "PYTHONUNBUFFERED": "1"},
     }
 
 
@@ -228,7 +228,7 @@ def install(dry_run: bool = False) -> list[str]:
     if not dry_run:
         result = _launchctl("print", _domain())
         if result.returncode:
-            raise InstallationError("Cannot access the macOS login session. Run `tharoor install` "
+            raise InstallationError("Cannot access the macOS login session. Run `roy install` "
                                     "from Terminal while logged in to the desktop.")
     for label, job in JOBS.items():
         path = AGENTS_DIR / f"{label}.plist"

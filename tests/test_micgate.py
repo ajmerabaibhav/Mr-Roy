@@ -18,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from mr_tharoor import micgate
+from mr_roy import micgate
 
 HOLD_MIC = """
 import sounddevice as sd, time
@@ -67,7 +67,7 @@ def test_bluetooth_fallback():
     try:
         # Stub the real device enumeration too. Without this the last assertion
         # below asks the live machine who owns the microphone, and fails
-        # whenever `tharoor listen` happens to be holding it -- a test that
+        # whenever `roy listen` happens to be holding it -- a test that
         # depends on what else is running is a test nobody believes.
         micgate.mic_users = lambda: []
         # A conversation app making sound on a Bluetooth mic means a call.
@@ -141,7 +141,7 @@ def main() -> int:
         users = micgate.mic_users()
         if not any(u.pid == holder.pid for u in users):
             # Our helper never got the device, because something else already
-            # has it -- most often the user's own `tharoor listen` daemon, which
+            # has it -- most often the user's own `roy listen` daemon, which
             # is supposed to be running. That is a busy machine, not a broken
             # gate. Skipping is honest; failing would train someone to ignore
             # a red result, and killing the other process is not a test's job.

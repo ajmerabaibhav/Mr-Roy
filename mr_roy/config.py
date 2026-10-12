@@ -6,7 +6,7 @@ import os
 from datetime import date
 from pathlib import Path
 
-ROOT = Path(os.environ.get("MR_THAROOR_HOME", Path.home() / "mr-tharoor"))
+ROOT = Path(os.environ.get("MR_ROY_HOME", Path.home() / "mr-roy"))
 
 DATA_DIR = ROOT / "data"
 REPORTS_DIR = ROOT / "reports"
@@ -36,7 +36,7 @@ def user_name() -> str:
     """Who the morning report greets. Overridable, defaults to the Mac account."""
     import subprocess
 
-    override = os.environ.get("MR_THAROOR_NAME")
+    override = os.environ.get("MR_ROY_NAME")
     if override:
         return override
     try:

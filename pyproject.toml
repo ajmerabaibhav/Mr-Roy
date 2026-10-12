@@ -1,5 +1,5 @@
 [project]
-name = "mr-tharoor"
+name = "mr-roy"
 version = "0.1.0"
 description = "An English teacher for macOS: reads how you write and what you dictate, and hands you a grammar lesson every morning."
 readme = "README.md"
@@ -13,17 +13,17 @@ dependencies = [
 dev = ["ruff>=0.5", "pytest>=8"]
 
 [project.urls]
-Homepage = "https://github.com/ajmerabaibhav/Mr-Tharoor"
+Homepage = "https://github.com/ajmerabaibhav/Mr-Roy"
 
 [project.scripts]
-tharoor = "mr_tharoor.cli:main"
+roy = "mr_roy.cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["mr_tharoor*"]
+include = ["mr_roy*"]
 
 [tool.setuptools.package-data]
-mr_tharoor = ["native/*.c"]
+mr_roy = ["native/*.c"]

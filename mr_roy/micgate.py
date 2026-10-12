@@ -1,7 +1,7 @@
 """Is another app using the microphone right now?
 
 The morning lesson must not pop open in the middle of a call, and asking
-CoreAudio costs microseconds. So `tharoor morning --automatic` waits while
+CoreAudio costs microseconds. So `roy morning --automatic` waits while
 this module says a call is happening.
 
 Primary path (macOS 14.2+): walk the audio process-object list and check
@@ -31,7 +31,7 @@ from dataclasses import dataclass
 
 _path = ctypes.util.find_library("CoreAudio")
 if _path is None:  # pragma: no cover - macOS always has this
-    raise ImportError("CoreAudio not found; mr-tharoor is macOS only")
+    raise ImportError("CoreAudio not found; mr-roy is macOS only")
 _ca = ctypes.CDLL(_path)
 
 
@@ -197,9 +197,9 @@ def _process_api_available() -> bool:
 
 
 def _is_our_listener(pid: int) -> bool:
-    """Is this Mr Tharoor's own daemon, seen from another process?
+    """Is this Mr Roy's own daemon, seen from another process?
 
-    `tharoor gate` runs in its own process, so the listener's recording looked
+    `roy gate` runs in its own process, so the listener's recording looked
     like "an app is using the microphone" -- an alarming, nameless holder
     that was actually us. Match on the command line, not the bundle id,
     because a bare python process has none.
@@ -214,8 +214,8 @@ def _is_our_listener(pid: int) -> bool:
         return False
     import re
 
-    return bool(re.search(r"(?:^|[/\s])tharoor\s+listen(?:\s|$)", command)
-                or "mr_tharoor.cli listen" in command)
+    return bool(re.search(r"(?:^|[/\s])roy\s+listen(?:\s|$)", command)
+                or "mr_roy.cli listen" in command)
 
 
 def mic_users(exclude_self: bool = True) -> list[MicUser]:
@@ -223,7 +223,7 @@ def mic_users(exclude_self: bool = True) -> list[MicUser]:
 
     Returns an empty list on macOS older than 14.2 -- callers should check
     `has_process_api` before treating that as "nobody is on a call".
-    Mr Tharoor's own listener is never counted, from any process.
+    Mr Roy's own listener is never counted, from any process.
     """
     if not _process_api_available():
         return []
@@ -314,7 +314,7 @@ def is_mic_in_use() -> bool:
 
 
 def why_open() -> tuple[bool, str, list[MicUser]]:
-    """The gate's reasoning, for logs and for `tharoor gate`."""
+    """The gate's reasoning, for logs and for `roy gate`."""
     if not has_process_api:
         running = _device_running_somewhere()
         return running, "device-running fallback (cannot exclude our own stream)", []

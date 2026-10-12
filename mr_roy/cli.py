@@ -1,12 +1,12 @@
-"""Mr Tharoor, your English teacher.
+"""Mr Roy, your English teacher.
 
-    tharoor setup                     one command: check, ask, schedule
-    tharoor listen                    the background job: reads your typing
-    tharoor analyse-day               the 23:30 job: check today, build the lesson
-    tharoor analyse-pending           catch up days missed while the Mac slept
-    tharoor morning                   the 08:30 job: open the lesson
-    tharoor install                   run every day by itself (launchd)
-    tharoor logs                      what the scheduled jobs did
+    roy setup                     one command: check, ask, schedule
+    roy listen                    the background job: reads your typing
+    roy analyse-day               the 23:30 job: check today, build the lesson
+    roy analyse-pending           catch up days missed while the Mac slept
+    roy morning                   the 08:30 job: open the lesson
+    roy install                   run every day by itself (launchd)
+    roy logs                      what the scheduled jobs did
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ def cmd_install(args: argparse.Namespace) -> int:
         print(f"  Installation incomplete: {exc}")
         return 1
     print("\n  A missed run is not skipped: launchd fires it when you next open the lid.")
-    print("  Remove anytime with `tharoor install --remove`. Nothing needs sudo.")
+    print("  Remove anytime with `roy install --remove`. Nothing needs sudo.")
     return 0
 
 
@@ -61,7 +61,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
         else ("",) * 5
     ok, bad = f"{green}●{reset}", f"{red}○{reset}"
 
-    print(f"\n  {bold}Mr Tharoor setup{reset}\n")
+    print(f"\n  {bold}Mr Roy setup{reset}\n")
     if platform.system() != "Darwin":
         print(f"    {bad} {platform.system()} is not supported. macOS only, for now.\n")
         return 1
@@ -112,7 +112,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
     except schedule.InstallationError as exc:
         for line in str(exc).splitlines():
             print(f"    {bad} {line}")
-        print("\n  Run `tharoor setup` again. Nothing needs sudo.\n")
+        print("\n  Run `roy setup` again. Nothing needs sudo.\n")
         return 1
 
     print(f"\n  {bold}Accessibility{reset}")
@@ -127,7 +127,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
         if sys.stdin.isatty():
             print(f"    {dim}Waiting for you (press Enter to skip)...{reset}", flush=True)
             granted = _wait_for(textboxes.GRANTED, 300, skippable=True,
-                                restart=f"{schedule._domain()}/com.tharoor.listen")
+                                restart=f"{schedule._domain()}/com.mrroy.listen")
     if granted:
         print(f"    {ok} granted: he can read the box you are typing in")
     else:
@@ -135,8 +135,8 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
     print(f"\n  {bold}Ready.{reset} He runs in the background and starts on every login.")
     print(f"  {dim}23:30 he checks the day. 08:30 the lesson opens by itself.{reset}\n")
-    print(f"    tharoor          {dim}what he does and what is running{reset}")
-    print(f"    tharoor logs     {dim}what the background jobs did{reset}\n")
+    print(f"    roy          {dim}what he does and what is running{reset}")
+    print(f"    roy logs     {dim}what the background jobs did{reset}\n")
     return 0
 
 
@@ -231,11 +231,11 @@ def _analyse_day(args: argparse.Namespace) -> int:
             except wispr.SchemaChanged as exc:
                 logger.error(f"Wispr reader disabled: {exc}")
                 print(f"  Wispr Flow database changed shape: {exc}")
-                print("  Previous report kept; see `tharoor logs`.")
+                print("  Previous report kept; see `roy logs`.")
                 return 1
             except Exception as exc:  # noqa: BLE001
                 logger.error(f"Wispr read failed: {type(exc).__name__}: {exc}")
-                print("  Wispr Flow could not be read. Previous report kept; see `tharoor logs`.")
+                print("  Wispr Flow could not be read. Previous report kept; see `roy logs`.")
                 return 1
             print(f"  {len(dictations)} dictations in Wispr Flow for {when}")
             for d in dictations:
@@ -492,7 +492,7 @@ def cmd_logs(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="tharoor", description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(prog="roy", description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="command", required=True)
 
     setup_cmd = sub.add_parser("setup", help="one command to get running")

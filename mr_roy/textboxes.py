@@ -26,7 +26,7 @@ What it refuses to read, before the text is ever fetched:
 What is scrubbed before it touches the disk: email addresses, links, long
 numbers (cards, phones, OTPs) and key-shaped tokens.
 
-Off until you grant Accessibility to the Python that runs `tharoor listen`.
+Off until you grant Accessibility to the Python that runs `roy listen`.
 It asks macOS once; a grant reaches only a process started after it, so
 setup restarts the listener while it waits, and on its own it restarts every
 RECHECK seconds until granted. Removing it there switches this off. Files go with everything else,
@@ -263,7 +263,7 @@ def focused() -> tuple[object, str, str] | None:
 
 
 def watch(stop: threading.Event, logger) -> None:
-    """The loop `tharoor listen` runs on a side thread. Never raises."""
+    """The loop `roy listen` runs on a side thread. Never raises."""
     import CoreFoundation as CF
 
     asked = config.DATA_DIR / ".asked-accessibility"
@@ -271,7 +271,7 @@ def watch(stop: threading.Event, logger) -> None:
         if not trusted(prompt=not asked.exists()):
             asked.touch()
             GRANTED.unlink(missing_ok=True)
-            logger.info("typing capture off until Accessibility is granted to Mr Tharoor "
+            logger.info("typing capture off until Accessibility is granted to Mr Roy "
                         f"(or {os.path.realpath(sys.executable)} without the app); waiting for it")
             # AXIsProcessTrusted never turns true inside a process started
             # before the grant (measured 10 Oct: granted, polled, stayed off;

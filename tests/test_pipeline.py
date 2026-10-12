@@ -7,7 +7,7 @@ from dataclasses import asdict
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 
-from mr_tharoor import cli, config, grammar, report, schedule, wispr
+from mr_roy import cli, config, grammar, report, schedule, wispr
 
 
 def test_style_and_regional_phrases_are_not_grammar_errors():
@@ -42,12 +42,12 @@ def test_latest_report_after_weekend_uses_completed_version():
 
 
 def test_schedule_handles_spaces_and_retries(monkeypatch):
-    monkeypatch.setattr(schedule.shutil, "which", lambda _: "/A folder/venv/bin/tharoor")
-    job = schedule.plist_for("com.tharoor.morning", schedule.JOBS["com.tharoor.morning"])
-    assert job["ProgramArguments"][0] == "/A folder/venv/bin/tharoor"
+    monkeypatch.setattr(schedule.shutil, "which", lambda _: "/A folder/venv/bin/roy")
+    job = schedule.plist_for("com.mrroy.morning", schedule.JOBS["com.mrroy.morning"])
+    assert job["ProgramArguments"][0] == "/A folder/venv/bin/roy"
     assert job["RunAtLoad"] and job["StartInterval"] == 900
     assert "--automatic" in job["ProgramArguments"]
-    assert "analyse-pending" in schedule.JOBS["com.tharoor.nightly"]["args"]
+    assert "analyse-pending" in schedule.JOBS["com.mrroy.nightly"]["args"]
 
 
 def test_analysis_lock_excludes_second_process():
@@ -74,7 +74,7 @@ def test_pending_retries_previous_day_after_midnight(monkeypatch):
 
 
 def test_empty_day_is_completed_and_saved(monkeypatch):
-    from mr_tharoor import log
+    from mr_roy import log
 
     monkeypatch.setattr(log, "get", lambda *a: SimpleNamespace(info=lambda *a: None, warning=lambda *a: None,
                                                              error=lambda *a: None))
@@ -112,7 +112,7 @@ def test_report_shows_corrections_and_no_pronunciation():
 
 def test_every_mistake_reaches_the_page(monkeypatch):
     # 10 Oct: 36 corrections found, 6 shown, and the page never said so.
-    from mr_tharoor import grammar, log, typed
+    from mr_roy import grammar, log, typed
 
     monkeypatch.setattr(log, "get", lambda *a: SimpleNamespace(info=lambda *a: None, warning=lambda *a: None,
                                                              error=lambda *a: None))

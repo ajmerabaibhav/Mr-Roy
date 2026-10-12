@@ -89,7 +89,7 @@ def _check_schema(conn: sqlite3.Connection) -> None:
     if missing:
         raise SchemaChanged(
             f"History is missing {sorted(missing)}; this reader was written for an "
-            f"older Wispr Flow. Update mr_tharoor/wispr.py."
+            f"older Wispr Flow. Update mr_roy/wispr.py."
         )
 
 
@@ -150,7 +150,7 @@ def for_day(day: date) -> list[Dictation]:
 
 
 def health() -> dict:
-    """For `tharoor setup` and `tharoor logs`: is this source usable right now."""
+    """For `roy setup` and `roy logs`: is this source usable right now."""
     if not DB_PATH.exists():
         return {"available": False, "reason": "Wispr Flow is not installed, or has no history yet"}
     try:

@@ -5,13 +5,13 @@ import datetime as dates
 import json
 from types import SimpleNamespace
 
-from mr_tharoor import cli, config, micgate, report
+from mr_roy import cli, config, micgate, report
 
 
 def test_renamed_daemon_is_still_excluded(monkeypatch):
     import subprocess
 
-    monkeypatch.setattr(subprocess, "run", lambda *a, **k: SimpleNamespace(stdout="python /bin/tharoor listen\n"))
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: SimpleNamespace(stdout="python /bin/roy listen\n"))
     assert micgate._is_our_listener(12)
 
 
@@ -124,9 +124,9 @@ def test_catch_up_opens_yesterday_the_moment_it_finishes(monkeypatch):
     assert calls == [yesterday], "reopened on every 15-min tick"
 
 
-def test_bare_tharoor_shows_the_welcome(capsys):
-    from mr_tharoor import cli
+def test_bare_roy_shows_the_welcome(capsys):
+    from mr_roy import cli
 
     assert cli.main([]) == 0
     out = capsys.readouterr().out
-    assert "Mr Tharoor" in out and "tharoor setup" in out and "Right now" in out
+    assert "Mr Roy" in out and "roy setup" in out and "Right now" in out

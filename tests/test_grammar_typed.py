@@ -1,6 +1,7 @@
 """The two new sources: a checked LLM reply, and the day's typing."""
 
 import json
+from dataclasses import asdict
 from datetime import date, datetime, timezone
 
 import pytest
@@ -92,82 +93,6 @@ def test_label_is_one_word_and_verified():
          "label": "Participle form", "why": "past participle after have"},
     ), ITEMS)
     assert out[0].label == "participle"  # one word, lowercased
-
-
-def test_week_refuses_to_invent_progress(tmp_path, monkeypatch):
-    """Days the old checker looked at must never be compared with the new one."""
-    import json as _json
-    from datetime import date, timedelta
-
-    from mr_roy import config, progress
-
-    today = date(2026, 9, 22)
-    for back, engine, found in ((1, "claude-cli", 6), (9, "local-rules", 0)):
-        day = today - timedelta(days=back)
-        (config.REPORTS_DIR / f"{day}-analysis.json").write_text(
-            _json.dumps({"grammar_engine": engine, "version": 2}))
-        (config.REPORTS_DIR / f"{day}-grammar-raw.json").write_text(
-            _json.dumps([{"label": "agreement"}] * found))
-    monkeypatch.setattr(progress, "_word_counts", lambda days: {d: 500 for d in days})
-
-    summary = progress.week(today)
-    assert summary["this_week"]["found"] == 6
-    assert summary["last_week"]["days"] == 0  # the local-rules day is not comparable
-    assert "Next week can be compared" in summary["verdict"]
-    assert summary["change"] is None
-
-
-def _seed(day, engine="claude-cli", version=2, found=0, label="agreement"):
-    import json as _json
-
-    from mr_roy import config
-
-    (config.REPORTS_DIR / f"{day}-analysis.json").write_text(
-        _json.dumps({"grammar_engine": engine, "version": version}))
-    (config.REPORTS_DIR / f"{day}-grammar-raw.json").write_text(
-        _json.dumps([{"label": label}] * found))
-
-
-def test_a_percentage_never_survives_a_verdict_of_no_difference(monkeypatch):
-    """The number and the sentence must agree, or the sentence is worthless."""
-    from datetime import date, timedelta
-
-    from mr_roy import progress
-
-    today = date(2026, 10, 20)
-    for back in range(1, 15):
-        _seed(today - timedelta(days=back), found=3 if back <= 7 else 2)
-    monkeypatch.setattr(progress, "_word_counts", lambda days: {d: 430 for d in days})
-
-    summary = progress.week(today)
-    assert "nothing has been proved" in summary["verdict"]
-    assert summary["change"] is None  # 21 against 14 is noise at this volume
-
-
-def test_an_older_analysis_layout_is_not_pooled_in(monkeypatch):
-    from datetime import date, timedelta
-
-    from mr_roy import progress
-
-    today = date(2026, 10, 20)
-    for back in range(1, 8):
-        _seed(today - timedelta(days=back), version=1, found=9)  # same engine, older layout
-    monkeypatch.setattr(progress, "_word_counts", lambda days: {d: 430 for d in days})
-    assert progress.week(today) is None
-
-
-def test_the_footer_does_not_claim_corrections_with_no_words(monkeypatch):
-    from datetime import date, timedelta
-
-    from mr_roy import progress, report
-
-    today = date(2026, 10, 20)
-    for back in range(1, 8):
-        _seed(today - timedelta(days=back), found=1)
-    monkeypatch.setattr(progress, "_word_counts", lambda days: {d: 0 for d in days})
-    rendered = report._week_html(today)
-    assert "Not enough material" in rendered
-    assert "corrections across" not in rendered
 
 
 def test_the_certain_rules_run_beside_the_model_without_repeating_it():
@@ -275,3 +200,15 @@ def test_two_passes_merge_one_mistake_once():
     second = [f("clear few of my doubts", "clear a few of my doubts"), f("about whole thing", "about the whole thing")]
     merged = grammar.merge_passes(first, second, items)
     assert [m.said for m in merged] == ["clear few of", "about whole thing"]
+
+
+def test_page_shows_no_history_it_cannot_keep():
+    """Data is kept two days: no weekly comparison, no repeat counts (product review, 12 Oct)."""
+    from datetime import date
+
+    from mr_roy import report
+
+    row = asdict(grammar.check("he don't know", "one", "typed")[0]) | {"times": 5}
+    page = report.build_html(date(2026, 10, 15), grammar=[row], analysis={"grammar_engine": "claude-cli"})
+    assert "Seven days" not in page and "compared with" not in page
+    assert "times this month" not in page and "5 times" not in page

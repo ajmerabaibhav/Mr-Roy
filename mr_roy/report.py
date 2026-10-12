@@ -77,12 +77,9 @@ def _grammar_html(habits: list[dict], name: str = "") -> str:
             # single bad record cost the whole night: no HTML, therefore no PDF.
             return None
         action = html.escape(f.instruction) if f.instruction else ""
-        times = int(h.get("times", 1))
         # The one word he should be able to say back when asked why it is wrong.
         label = html.escape((h.get("label") or h["kind"]).upper())
         tag = "" if (h.get("label") or h["kind"]).lower() == h["kind"].lower() else html.escape(h["kind"])
-        if times > 1:
-            tag += (" &middot; " if tag else "") + f"{times} times this month"
         return (
             f'<div class="item"><div class="num">{number}</div><div class="body">'
             f'<div class="tagline"><span class="label">{label}</span>{tag}</div>'
@@ -126,38 +123,6 @@ def _grammar_html(habits: list[dict], name: str = "") -> str:
         out.append(f'<h3 class="sect">{title}</h3><div class="sub2">{blurb}</div>'
                    f'<div class="lesson">{"".join(items)}</div>')
     return "".join(out)
-
-
-def _week_html(day: date) -> str:
-    """Seven days against the seven before. Silent when there is nothing to say."""
-    from . import progress
-
-    try:
-        summary = progress.week(day)
-    except Exception:  # noqa: BLE001  a progress strip must never cost a report
-        return ""
-    if not summary or not summary.get("verdict"):
-        return ""
-    now = summary["this_week"]
-    extra = []
-    if summary.get("fixed"):
-        extra.append("Gone since last week: <b>" + ", ".join(
-            html.escape(w) for w in summary["fixed"]) + "</b>.")
-    if summary.get("persisting"):
-        extra.append("Still with you: <b>" + ", ".join(
-            html.escape(w) for w in summary["persisting"]) + "</b>.")
-    note = f'<div class="week-note">{" ".join(extra)}</div>' if extra else ""
-    return (
-        '<div class="week"><div class="week-head">Seven days</div>'
-        f'<div class="week-body">{html.escape(summary["verdict"])}</div>'
-        f'{note}'
-        # Without the word count the footer reads as a contradiction under the
-        # "not enough material" verdict: no material, five corrections.
-        + (f'<div class="week-foot">{now["found"]} corrections across {now["days"]} '
-           f'analysed day{"s" if now["days"] != 1 else ""}, {now["words"]:,} words of your own. '
-           'Only days this checker read are counted.</div>' if now["words"] else "")
-        + '</div>'
-    )
 
 
 def _provenance(analysis: dict) -> str:
@@ -231,7 +196,6 @@ def build_html(day: date, grammar: list[dict] | None = None, analysis: dict | No
         ))
         .replace("{{PORTRAIT}}", PORTRAIT)
         .replace("{{FAVICON}}", _favicon())
-        .replace("{{WEEK}}", _week_html(day))
         .replace("{{PROVENANCE}}", _provenance(analysis or {}))
         .replace("{{REMARK}}", html.escape(remark))
     )
@@ -361,14 +325,6 @@ letter-spacing:.03em;vertical-align:middle}
 .card{background:var(--card);border:1px solid var(--rule);margin-bottom:14px;break-inside:avoid}
 .card-head{padding:15px 18px;border-bottom:1px solid var(--rule);background:var(--wash)}
 .words{font-size:.87rem;color:var(--ink2);margin-top:7px;line-height:1.5}
-.week{border:1px solid var(--rule2);border-left:3px solid var(--mark);background:var(--card);
-padding:15px 18px;margin:0 0 26px;break-inside:avoid}
-.week-head{font:700 .64rem/1 -apple-system,BlinkMacSystemFont,sans-serif;color:var(--mark);
-letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px}
-.week-body{font-size:1.02rem;line-height:1.55}
-.week-note{font-size:.88rem;color:var(--ink2);margin-top:7px}
-.week-note b{color:var(--mark);font-weight:600}
-.week-foot{font:.72rem/1.5 -apple-system,BlinkMacSystemFont,sans-serif;color:var(--muted);margin-top:8px}
 .tribute{font-size:.76rem;color:var(--muted);line-height:1.6;margin-top:30px;padding-top:14px;
 border-top:1px solid var(--rule)}
 @media(max-width:620px){.item{grid-template-columns:28px 1fr;gap:10px}}
@@ -382,7 +338,6 @@ body{padding:0 0 12px;font-size:11.5pt}.wrap{max-width:none}
 <div class="greet">{{GREETING}}</div>
 <div class="remark">{{REMARK}}</div>
 {{STATS}}
-{{WEEK}}
 {{GRAMMAR}}
 {{SUMMARY}}
 {{PROVENANCE}}

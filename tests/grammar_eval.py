@@ -4,6 +4,7 @@ Usage: python tests/grammar_eval.py old [runs]       the prompt in grammar.py
        python tests/grammar_eval.py new [runs] FILE  a candidate prompt from FILE
 
 8 Oct 2026, this prompt with two passes: caught 10/10, false alarms 0/6.
+11 Oct 2026, Haiku 5.5, one pass (what ships): 9, 10, 10 of 10 on three runs, false alarms 0/6.
 """
 import sys, time
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parents[1]))

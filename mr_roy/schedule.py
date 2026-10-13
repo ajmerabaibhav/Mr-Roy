@@ -18,7 +18,7 @@ Three agents, deliberately separate so one failing never takes the others out:
     com.mrroy.morning   08:30, opens the report.
 
 Every agent runs as you, in your login session. Nothing installs to /Library,
-nothing needs sudo, nothing runs as root. Removing it is `roy uninstall`, and
+nothing needs sudo, nothing runs as root. Removing it is `roy install --remove`, and
 what that removes is three files in ~/Library/LaunchAgents.
 """
 
@@ -66,10 +66,11 @@ JOBS = {
 
 
 def _roy() -> list[str]:
-    """The installed command, resolved now rather than guessed at run time."""
-    found = shutil.which("roy")
-    if found:
-        return [found]
+    """The installation running setup now, not the first `roy` on PATH: an
+    unactivated venv would otherwise wire the jobs to an older install."""
+    beside = Path(sys.executable).with_name("roy")
+    if beside.exists():
+        return [str(beside)]
     return [sys.executable, "-m", "mr_roy.cli"]
 
 
@@ -116,10 +117,15 @@ def launcher() -> str | None:
         iconset = stamp.with_name("AppIcon.iconset")  # iconutil: sips failed writing its temp file
         iconset.mkdir(exist_ok=True)
         (iconset / "icon_512x512@2x.png").write_bytes(icon)
-        subprocess.run(["iconutil", "-c", "icns", str(iconset), "-o", str(stamp.with_name("AppIcon.icns"))],
-                       capture_output=True, timeout=60)
+        made = subprocess.run(["iconutil", "-c", "icns", str(iconset), "-o", str(stamp.with_name("AppIcon.icns"))],
+                              capture_output=True, text=True, timeout=60)
+        if made.returncode:
+            print(f"Mr Roy.app has no icon (iconutil: {made.stderr.strip()}); it works the same.", file=sys.stderr)
         shutil.rmtree(iconset)
         stamp.write_text(digest)  # before signing: a file added after breaks the seal
+        # Finder info or a resource fork anywhere in the bundle makes codesign
+        # refuse ("detritus not allowed"); the reused folder can carry them.
+        subprocess.run(["xattr", "-cr", str(APP)], capture_output=True, timeout=60)
         signed = built and subprocess.run(["codesign", "--force", "-s", "-", "-i", APP_INFO["CFBundleIdentifier"],
                                            str(APP)], capture_output=True, timeout=60).returncode == 0
     except (OSError, subprocess.TimeoutExpired):
@@ -173,7 +179,10 @@ def plist_for(label: str, job: dict) -> dict:
         "LowPriorityIO": True,
         "Nice": 5,  # never compete with whatever you are actually doing
         "ProcessType": "Background",
-        "EnvironmentVariables": {"MR_ROY_HOME": str(config.ROOT), "PYTHONUNBUFFERED": "1"},
+        # launchd does not see your shell, so MR_ROY_NO_LLM / MR_ROY_LLM set
+        # when you ran setup are carried into the jobs. Unset = auto-pick.
+        "EnvironmentVariables": {**{k: v for k, v in os.environ.items() if k.startswith("MR_ROY_")},
+                                 "MR_ROY_HOME": str(config.ROOT), "PYTHONUNBUFFERED": "1"},
     }
 
 
@@ -266,16 +275,20 @@ def install(dry_run: bool = False) -> list[str]:
 
 
 def uninstall() -> list[str]:
-    removed = []
+    removed, failures = [], []
     for label in JOBS:
         path = AGENTS_DIR / f"{label}.plist"
         if path.exists():
             if service_state(label)["loaded"]:
                 result = _launchctl("bootout", f"{_domain()}/{label}")
-                if result.returncode:
-                    raise InstallationError(f"Could not unload {label}: {result.stderr.strip()}")
+                # "5: Input/output error" often comes back for a job that did stop.
+                if result.returncode and service_state(label)["loaded"]:
+                    failures.append(f"{label}: {result.stderr.strip()}")
+                    continue  # one stuck job must not leave the others running
             path.unlink()
             removed.append(label)
+    if failures:
+        raise InstallationError("Could not stop " + "; ".join(failures))
     return removed
 
 

@@ -61,6 +61,9 @@ SENTENCE = re.compile(r"(?<=[.!?])\s+|\n+")
 SCRUB = [
     (re.compile(r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b"), "[email]"),
     (re.compile(r"\b(?:https?://|www\.)\S+", re.IGNORECASE), "[link]"),
+    # Links typed without http:// or www. (example.com/reset?token=...)
+    (re.compile(r"\b[\w-]+(?:\.[\w-]+)*\.(?:com|org|net|io|ai|app|dev|co|in|me|gov|edu|xyz|so|ly|gg|tv|uk|us)\b(?:/\S*)?",
+                re.IGNORECASE), "[link]"),
     (re.compile(r"(?<![\w-])(?=[\w-]*\d)(?=[\w-]*[A-Za-z])[\w-]{20,}"), "[key]"),
     (re.compile(r"\+?\d[\d\s-]{4,}\d"), "[number]"),
 ]
@@ -161,10 +164,17 @@ def write(app: str, sentences: list[str], day: date | None = None) -> None:
 def for_day(day: date) -> list[tuple[str, str]]:
     """[(app, sentence)] captured on `day`, without repeats."""
     try:
-        rows = [json.loads(line) for line in
-                (folder() / f"{day.isoformat()}.jsonl").read_text().splitlines() if line.strip()]
-    except (OSError, json.JSONDecodeError):
+        lines = (folder() / f"{day.isoformat()}.jsonl").read_text().splitlines()
+    except OSError:
         return []
+    rows = []
+    for line in lines:
+        # One line torn by a kill or power cut used to cost the whole day.
+        try:
+            row = json.loads(line)
+            rows.append({"app": row["app"], "text": row["text"]})
+        except (ValueError, TypeError, KeyError):
+            continue
     out, seen = [], set()
     for row in rows:
         if row["text"] not in seen:

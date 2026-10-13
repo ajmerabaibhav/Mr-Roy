@@ -4,6 +4,50 @@ What changed, when, and what was measured. Newest first.
 The current state of the project is in [README.md](README.md); what is still
 broken or deferred is in [TODOS.md](TODOS.md).
 
+## Install fixes — 13 October 2026
+
+- **Background jobs ignored `MR_ROY_NO_LLM` and `MR_ROY_LLM`**: launchd does
+  not see your shell. Any `MR_ROY_*` set when you run setup/install is now
+  written into the jobs; unset still means auto-pick Claude, else Codex.
+- **Setup could wire the jobs to an older install** (first `roy` on PATH; a
+  fresh clone picked an old Anaconda copy). It now uses the `roy` beside the
+  Python running setup.
+- **Finder info on `Mr Roy.app` made codesign refuse** ("detritus not
+  allowed"), silently dropping to plain Python. Extended attributes are
+  cleared before signing; a failed icon build is now reported.
+
+## Product review — 12 October 2026
+
+Four reviewers (auditor, critic, product expert, a simulated new user) ran
+against the README's promises; every finding below was reproduced first and
+has a test in `tests/test_product_review.py`.
+
+- **The nightly Claude call kept a transcript of the day's sentences** in
+  `~/.claude/projects` (156 files since 22 Sep), outside the two-night purge.
+  Now `--no-session-persistence`, as Codex already had `--ephemeral`.
+- `roy analyse-day --day <future date>` purged everything kept, today's typing
+  included. The purge now never runs relative to a future day.
+- `roy morning` straight after `roy analyse-day` said "no completed report".
+  By hand it now opens today's page.
+- An unreadable `grammar.json` made the morning job reopen the page every 15
+  minutes. The "opened" state is saved first and the read is guarded.
+- One torn line in a day's typing file threw the whole day away; now only
+  that line is skipped.
+- A correction quoting "a apple" passed the "really in your text" check
+  against "a banana apple". The span must now match whole words.
+- Links typed without `http://` or `www.` were saved unscrubbed.
+- With no grammar checker the page said "Rest on it": a false all-clear. It
+  now says only local rules ran. A failed check says it is not a verdict.
+- The 480-message nightly limit is on the page when it bites, and messages
+  are sent whole up to 1,200 characters instead of cut at 600.
+- A Wispr hand-edit correction quoted the first 160 characters of the
+  dictation, not the sentence with the mistake.
+- `roy install --remove` crashed on launchd's error 5 and left the other jobs
+  running; it now carries on and says where your saved data still is.
+- `MR_ROY_NO_LLM=1` was reported as "no Claude Code or Codex installed".
+- README: install via a venv (the Mac's Python is 3.9), where data lives,
+  the one-pass eval (9–10 of 10), and the author's test sentences in the repo.
+
 ## Renamed: Mr Roy — 12 October 2026
 
 The project was called Mr Tharoor. A product named after a living public

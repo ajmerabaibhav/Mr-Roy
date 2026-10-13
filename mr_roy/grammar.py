@@ -274,7 +274,7 @@ def compare(heard: str, meant: str, source: str = "", *, edited: bool = False) -
             continue
         change, word = _describe(before, after)
         if not any(f.said in said for f in out):
-            out.append(GrammarFinding(kind, said, fixed, heard.strip()[:160], source,
+            out.append(GrammarFinding(kind, said, fixed, _around(heard, said), source,
                                       change=change, word=word, basis="user_edit"))
     return out
 
@@ -458,8 +458,10 @@ def _call_llm(binary: str, prompt: str, config) -> str:
         # No tools, no settings, a one-line system prompt. Measured: Claude
         # Code's own coding prompt and tool list cost 26,600 tokens a call
         # before reading a word of yours; this costs about 400.
+        # --no-session-persistence: otherwise every night's sentences stay in
+        # ~/.claude/projects as a transcript, long after purge_expired (156 files, 12 Oct).
         command = [binary, "-p", prompt, "--model", LLM_MODEL or "claude-haiku-5-5",
-                   "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}',
+                   "--no-session-persistence", "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}',
                    "--tools", "", "--setting-sources", "",
                    "--system-prompt", "You are an exacting English teacher."]
     result = subprocess.run(
@@ -576,7 +578,7 @@ def parse_llm(reply: str, items: list[tuple[str, str]], mode: str = "spoken") ->
         if not (0 <= index < len(items)) or not said or not should_be:
             continue
         source, text = items[index]
-        if _normalised(said) not in _normalised(text):
+        if f" {_normalised(said)} " not in f" {_normalised(text)} ":  # whole words: "a apple" is not in "a banana apple"
             continue  # not in the transcript: a paraphrase or an invention
         if _normalised(said) == _normalised(should_be):
             continue
@@ -608,6 +610,15 @@ def merge(llm: list[GrammarFinding], rules: list[GrammarFinding]) -> list[Gramma
     return llm + extra
 
 
+def _checkable(items: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    return [(source, text) for source, text in items if len(_words(text)) >= 4]
+
+
+def unchecked(items: list[tuple[str, str]]) -> int:
+    """How many messages the nightly cap leaves unread, so the page can say so."""
+    return max(0, len(_checkable(items)) - LLM_BATCH * LLM_MAX_BATCHES)
+
+
 def llm_check(items: list[tuple[str, str]], mode: str = "spoken", *, logger=None,
               failed: list | None = None) -> list[GrammarFinding]:
     """Grammar over a day's utterances. `items` is [(source label, text), ...].
@@ -615,13 +626,13 @@ def llm_check(items: list[tuple[str, str]], mode: str = "spoken", *, logger=None
     A call that fails appends `mode` to `failed`, so the caller can mark the
     day unfinished instead of publishing a page that silently skipped it.
     """
-    items = [(source, text) for source, text in items if len(_words(text)) >= 4]
+    items = _checkable(items)
     if not items or not llm_available():
         return []
     out: list[GrammarFinding] = []
     batches = [items[i:i + LLM_BATCH] for i in range(0, len(items), LLM_BATCH)][:LLM_MAX_BATCHES]
     for batch in batches:
-        listing = "\n".join(f"[{n}] {text.strip()[:600]}" for n, (_, text) in enumerate(batch, 1))
+        listing = "\n".join(f"[{n}] {text.strip()[:1200]}" for n, (_, text) in enumerate(batch, 1))
         prompt = PROMPT.format(
             kind="speech" if mode == "spoken" else "writing",
             unit="utterance" if mode == "spoken" else "message",
@@ -644,7 +655,7 @@ def llm_check(items: list[tuple[str, str]], mode: str = "spoken", *, logger=None
                     failed.append(mode)
                 return out + found
             found = merge_passes(found, parse_llm(reply, batch, mode), batch)
-        if not found and reply.strip() and logger:
+        if not found and reply.strip() and reply.strip() != "[]" and logger:
             # An empty reply is normal; an empty reply that is not JSON at all
             # is the CLI telling us something, usually that it is logged out.
             # A reply that produced nothing is either a clean day or a format

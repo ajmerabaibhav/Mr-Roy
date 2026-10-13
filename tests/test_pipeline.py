@@ -41,10 +41,13 @@ def test_latest_report_after_weekend_uses_completed_version():
     assert report.latest_day() == day
 
 
-def test_schedule_handles_spaces_and_retries(monkeypatch):
-    monkeypatch.setattr(schedule.shutil, "which", lambda _: "/A folder/venv/bin/roy")
+def test_schedule_handles_spaces_and_retries(monkeypatch, tmp_path):
+    venv = tmp_path / "A folder" / "bin"
+    venv.mkdir(parents=True)
+    (venv / "roy").touch()
+    monkeypatch.setattr(schedule.sys, "executable", str(venv / "python"))
     job = schedule.plist_for("com.mrroy.morning", schedule.JOBS["com.mrroy.morning"])
-    assert job["ProgramArguments"][0] == "/A folder/venv/bin/roy"
+    assert job["ProgramArguments"][0] == str(venv / "roy")
     assert job["RunAtLoad"] and job["StartInterval"] == 900
     assert "--automatic" in job["ProgramArguments"]
     assert "analyse-pending" in schedule.JOBS["com.mrroy.nightly"]["args"]

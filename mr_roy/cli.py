@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -23,10 +24,17 @@ def cmd_install(args: argparse.Namespace) -> int:
     from . import schedule
 
     if args.remove:
-        removed = schedule.uninstall()
+        try:
+            removed = schedule.uninstall()
+        except schedule.InstallationError as exc:
+            print(f"  {exc}\n  Run `roy install --remove` again in a few seconds.")
+            return 1
         print("Removed:" if removed else "Nothing was installed.")
         for label in removed:
             print(f"  {label}")
+        # Nothing purges once the nightly job is gone; say where the sentences are.
+        print(f"  Your saved typing and lessons are still in {config.DATA_DIR} and {config.REPORTS_DIR};"
+              " delete those to remove them.")
         return 0
     if args.status:
         for line in schedule.status():
@@ -208,7 +216,9 @@ def _analyse_day(args: argparse.Namespace) -> int:
     when = date.fromisoformat(args.day) if args.day else date.today()
     logger = log.get("nightly")
 
-    files, freed = config.purge_expired(when)
+    # Never purge relative to a future --day: a typo of 2026-12-01 deleted
+    # everything kept, today's typing included.
+    files, freed = config.purge_expired(min(when, date.today()))
     if files:
         logger.info(f"deleted {files} expired files, freed {freed} MB")
         print(f"  deleted {files} files older than {config.KEEP_DAYS} days ({freed} MB)")
@@ -272,6 +282,8 @@ def _analyse_day(args: argparse.Namespace) -> int:
             found = grammar.llm_check(spoken_texts, "spoken", logger=logger, failed=grammar_failed)
             found += grammar.llm_check(typed_texts, "typed", logger=logger, failed=grammar_failed)
             grammar_findings += grammar.merge(found, rules)
+        elif os.environ.get("MR_ROY_NO_LLM"):
+            logger.info("MR_ROY_NO_LLM is set; local rules only")
         else:
             logger.warning("neither Claude Code nor Codex CLI found; grammar falls back to local rules")
             grammar_findings += rules
@@ -331,6 +343,9 @@ def _analyse_day(args: argparse.Namespace) -> int:
             # Lid shut mid-run wakes the Mac in DarkWake with no network (5 Oct).
             # The page is still written for the morning; analyse-pending redoes the day.
             "grammar_failed": grammar_failed,
+            # The nightly cap (grammar.LLM_MAX_BATCHES) was silent; now the page says it.
+            "unchecked": (grammar.unchecked(spoken_texts) + grammar.unchecked(typed_texts)
+                          if grammar.llm_available() else 0),
         }
         written = report.write(when, grammar=grammar_rows, analysis=analysis)
         analysis["outputs"] = sorted(written)
@@ -427,7 +442,9 @@ def _morning(args: argparse.Namespace) -> int:
 
         if not 8 <= datetime.now().hour < 21 or micgate.is_mic_in_use():
             return 0
-    day = report.latest_day(before=date.today())
+    # By hand, today's page counts: `roy analyse-day && roy morning` said
+    # "no completed report" right after writing one.
+    day = report.latest_day(before=date.today() + timedelta(days=0 if automatic else 1))
     if day is None:
         print("  No completed report yet. Analysis will catch up at the next scheduled check.")
         return 0
@@ -461,8 +478,15 @@ def _morning(args: argparse.Namespace) -> int:
             pass
     with log.step("morning"):
         path = report.open_report(day)
-        grammar_file = config.REPORTS_DIR / f"{day.isoformat()}-grammar.json"
-        habits = json.loads(grammar_file.read_text()) if grammar_file.exists() else []
+        if path:
+            # Saved before anything else can fail: an unreadable grammar.json
+            # once meant the page reopened every 15 minutes until 21:00.
+            config.write_json_atomically(state_path, {"opened_on": str(date.today()), "report_day": str(day),
+                                                      "complete": complete})
+        try:
+            habits = json.loads((config.REPORTS_DIR / f"{day.isoformat()}-grammar.json").read_text())
+        except (OSError, ValueError):
+            habits = []
         name = config.user_name()
         if path:
             body = (f"{len(habits)} correction{'s' if len(habits) != 1 else ''} from {day:%A}. "
@@ -473,8 +497,6 @@ def _morning(args: argparse.Namespace) -> int:
                  f'{json.dumps(f"Good morning, {name}")} sound name "Glass"'],
                 capture_output=True,
             )
-            config.write_json_atomically(state_path, {"opened_on": str(date.today()), "report_day": str(day),
-                                                      "complete": complete})
     if path:
         print(f"  Good morning, {name}. Opened {path}")
     else:

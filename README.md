@@ -29,7 +29,8 @@ macOS. He never opens your microphone and never touches audio.
 
 ## What you need
 
-- **A Mac** and **Python 3.10 or newer**.
+- **A Mac** and **Python 3.10 or newer** (`python3 --version`). The Mac's own
+  Python is 3.9; get a newer one from python.org or with `brew install python`.
 - **Claude Code or Codex**, installed and logged in. The grammar check runs
   through it once a night, on your own plan; nothing else to pay for.
 - **Wispr Flow** (optional). It is where he reads what you say. Without it
@@ -39,12 +40,17 @@ macOS. He never opens your microphone and never touches audio.
 
 ```bash
 git clone https://github.com/ajmerabaibhav/Mr-Roy.git mr-roy
-cd mr-roy && pip install -e . && roy setup
+cd mr-roy && python3 -m venv .venv && source .venv/bin/activate
+pip install -e . && roy setup
 ```
 
+To have `roy` in every new terminal, add `~/mr-roy/.venv/bin` to your PATH.
+Everything he saves (`data/`, `reports/`, `logs/`) goes in `~/mr-roy`
+wherever you cloned the code; set `MR_ROY_HOME` to put it elsewhere.
+
 `roy setup` checks the machine, says what he reads, starts three
-background jobs and asks macOS for Accessibility. One small dependency, no
-model download. Then type and dictate normally. That is the whole interaction.
+background jobs and asks macOS for Accessibility. One dependency (PyObjC's
+Accessibility bindings), no model download. Then type and dictate normally. That is the whole interaction.
 
 - **What he reads.** Your Wispr Flow dictations, what you type into Claude
   Code and Codex chats (from their own history on your Mac), and, with
@@ -107,7 +113,7 @@ dropped. Nothing else stands between you and an invented mistake.
 | `roy morning` | open the latest lesson |
 | `roy logs` | what the scheduled jobs actually did |
 | `roy install --status` | are the three agents really running |
-| `roy install --remove` | stop all of it |
+| `roy install --remove` | stop all of it (saved lessons stay until you delete `data/` and `reports/`) |
 
 ## What he will not claim
 
@@ -117,12 +123,15 @@ dropped. Nothing else stands between you and an invented mistake.
 - **He never opens the microphone, so meetings are never heard.** Speech
   comes only from Wispr Flow, when you choose to dictate.
 - **He can miss things.** On 16 real sentences (`tests/grammar_eval.py`) he
-  caught all 10 errors and marked none of the 6 Indian English traps, but a
+  caught 9 or 10 of the 10 errors on three runs of the nightly single pass
+  and marked none of the 6 Indian English traps, but a
   quiet page means "nothing he could prove", not "perfect English".
 - **Text leaves the machine once a night** for the grammar call.
   It uses the Claude Code CLI, or OpenAI's Codex CLI if that is what you have
   (`MR_ROY_LLM=codex` to choose it when both are installed).
   `MR_ROY_NO_LLM=1` turns that off and falls back to local rules.
+  Set these before `roy setup` (or re-run `roy install` after changing them):
+  the background jobs keep what was set then.
   To keep that text out of model training, on a personal plan turn off "Help improve Claude" at
   claude.ai/settings/data-privacy-controls, or "Improve the model for
   everyone" in ChatGPT → Settings → Data controls (it covers Codex too).
@@ -136,7 +145,8 @@ is gone on Wednesday night. He never opens the microphone. Typed text is read on
 password fields, password managers, terminals or private chats, and emails,
 links and long numbers are scrubbed before it is saved. `data/`,
 `reports/` and `logs/` are gitignored; this repo contains no one's sentences
-but the example above.
+but the example above and the author's own 16 test sentences in
+`tests/grammar_eval.py`.
 
 ## Tests
 

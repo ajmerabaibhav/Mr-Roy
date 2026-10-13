@@ -145,6 +145,13 @@ def build_html(day: date, grammar: list[dict] | None = None, analysis: dict | No
     if grammar:
         remark = (f"Your phrasing gave me {len(grammar)} thing{'s' if len(grammar) != 1 else ''} to "
                   "set right, and phrasing is what a listener notices first. They are set out below, in order.")
+    elif analysis and analysis.get("grammar_failed"):
+        remark = ("The grammar check did not finish tonight, so this page is not a verdict. "
+                  "I shall try again once the checker answers.")
+    elif analysis and not str(analysis.get("grammar_engine", "")).endswith("-cli"):
+        # Four local rules catch almost nothing; "rest on it" was a false all-clear.
+        remark = ("Only my few local rules ran, because neither Claude Code nor Codex was "
+                  "available, so a quiet page proves nothing. Run roy setup to see why.")
     else:
         remark = ("Nothing in your phrasing today that I am willing to call a mistake. "
                   "Rest on it; I shall be reading again tomorrow.")
@@ -174,7 +181,9 @@ def build_html(day: date, grammar: list[dict] | None = None, analysis: dict | No
             '<div class="card"><div class="card-head">'
             '<strong>Processing summary</strong><div class="words">'
             f'{wispr_count} dictation{"s" if wispr_count != 1 else ""} and '
-            f'{typed_count} typed message{"s" if typed_count != 1 else ""} read.</div>'
+            f'{typed_count} typed message{"s" if typed_count != 1 else ""} read.'
+            + (f' The nightly limit left {int(analysis["unchecked"])} of them unchecked.'
+               if analysis.get("unchecked") else "") + '</div>'
             f'<div class="words">Generated {html.escape(generated)}'
             ' (local time).'
             + (' This is a partial-day report; analysis will run again after the day ends.'

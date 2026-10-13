@@ -111,7 +111,8 @@ def _status() -> list[tuple[bool, str, str]]:
         latest = None
     rows.append((bool(latest), "Wispr Flow", f"last dictation {latest[:10]}" if latest else "not found"))
     rows.append((grammar.llm_available(), "grammar",
-                 f"checked by {grammar.llm_name()}" if grammar.llm_available() else "no Claude Code or Codex CLI"))
+                 f"checked by {grammar.llm_name()}" if grammar.llm_available() else "off (MR_ROY_NO_LLM)" if os.environ.get("MR_ROY_NO_LLM")
+                 else "no Claude Code or Codex CLI"))
     pages = sorted(config.REPORTS_DIR.glob("????-??-??.html"))
     rows.append((bool(pages), "lessons", f"latest {pages[-1].stem}" if pages else "first one tomorrow 08:30"))
     return rows

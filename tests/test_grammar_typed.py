@@ -80,9 +80,8 @@ def test_typed_reads_only_what_a_person_typed(tmp_path, monkeypatch):
 
 def test_llm_is_optional(monkeypatch):
     monkeypatch.setattr(grammar, "llm_binary", lambda: "/bin/echo")
-    monkeypatch.delenv("MR_ROY_NO_LLM", raising=False)
     assert grammar.llm_available()
-    monkeypatch.setenv("MR_ROY_NO_LLM", "1")
+    monkeypatch.setattr(grammar, "llm_binary", lambda: None)
     assert not grammar.llm_available()
     assert grammar.llm_check(ITEMS) == []  # and nothing is spawned
 
@@ -129,7 +128,6 @@ def test_codex_is_used_when_claude_is_missing(monkeypatch, tmp_path):
     monkeypatch.setattr(grammar, "LLM_CLI", "")
     monkeypatch.setattr(grammar.shutil, "which", lambda name: str(codex) if name == "codex" else None)
     monkeypatch.setattr(grammar.os, "access", lambda path, mode: str(path) == str(codex))
-    monkeypatch.delenv("MR_ROY_NO_LLM", raising=False)
     assert grammar.llm_name() == "codex"
     found = grammar.llm_check([("s1", "thank you for the result you have gave me today")], "typed")
     assert [(f.said, f.should_be) for f in found] == [("you have gave", "you have given")]

@@ -179,7 +179,7 @@ def plist_for(label: str, job: dict) -> dict:
         "LowPriorityIO": True,
         "Nice": 5,  # never compete with whatever you are actually doing
         "ProcessType": "Background",
-        # launchd does not see your shell, so MR_ROY_NO_LLM / MR_ROY_LLM set
+        # launchd does not see your shell, so MR_ROY_LLM / MR_ROY_LLM_MODEL set
         # when you ran setup are carried into the jobs. Unset = auto-pick.
         "EnvironmentVariables": {**{k: v for k, v in os.environ.items() if k.startswith("MR_ROY_")},
                                  "MR_ROY_HOME": str(config.ROOT), "PYTHONUNBUFFERED": "1"},

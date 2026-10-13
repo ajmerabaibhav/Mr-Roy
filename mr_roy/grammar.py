@@ -15,8 +15,7 @@ Two engines live here.
                           day's raw transcripts. On one real day: 23
                           corrections where the rules found 0.
 
-The rules remain as the fallback when the CLI is absent or MR_ROY_NO_LLM
-is set, because a grammar section that needs a network is worse than a thin
+The rules remain as the fallback when neither CLI is installed, because a grammar section that needs a network is worse than a thin
 one that does not.
 
 What keeps the second engine honest is not the prompt, it is the check after
@@ -314,7 +313,7 @@ def summarise(findings: list[GrammarFinding], limit: int = 8) -> list[dict]:
 # subscription, so the grammar half costs one subprocess call a night and no
 # new dependency. Text leaves the laptop for that call; audio never does, and
 # the great majority of this text was dictated or typed into Claude to begin
-# with. MR_ROY_NO_LLM=1 turns it off and leaves the local rules.
+# with.
 # Codex is the same idea for people with ChatGPT instead of Claude: it is used
 # when claude is not installed, or always with MR_ROY_LLM=codex.
 #
@@ -413,7 +412,7 @@ def llm_name() -> str:
 
 
 def llm_available() -> bool:
-    return not os.environ.get("MR_ROY_NO_LLM") and llm_binary() is not None
+    return llm_binary() is not None
 
 
 def _normalised(text: str) -> str:

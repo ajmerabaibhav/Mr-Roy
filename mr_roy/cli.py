@@ -282,8 +282,6 @@ def _analyse_day(args: argparse.Namespace) -> int:
             found = grammar.llm_check(spoken_texts, "spoken", logger=logger, failed=grammar_failed)
             found += grammar.llm_check(typed_texts, "typed", logger=logger, failed=grammar_failed)
             grammar_findings += grammar.merge(found, rules)
-        elif os.environ.get("MR_ROY_NO_LLM"):
-            logger.info("MR_ROY_NO_LLM is set; local rules only")
         else:
             logger.warning("neither Claude Code nor Codex CLI found; grammar falls back to local rules")
             grammar_findings += rules

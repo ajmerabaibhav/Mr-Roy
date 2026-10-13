@@ -134,8 +134,7 @@ def _provenance(analysis: dict) -> str:
     return ('<div class="tribute">'
             f"Grammar was checked by the {'Codex' if engine == 'codex-cli' else 'Claude Code'} CLI "
             "already installed here, which means the day's "
-            'transcript text was sent for that one call. Set MR_ROY_NO_LLM=1 to use local rules '
-            'instead.</div>')
+            'transcript text was sent for that one call.</div>')
 
 
 def build_html(day: date, grammar: list[dict] | None = None, analysis: dict | None = None) -> str:

@@ -102,7 +102,7 @@ Known ceilings of this approach:
 
 | What | Why it is acceptable |
 |---|---|
-| Transcript text now leaves the machine | Stated in the README and in the report footer. Audio still does not. `MR_ROY_NO_LLM=1` reverts to local rules. |
+| Transcript text now leaves the machine | Stated in the README and in the report footer. Audio still does not. No opt-out (13 Oct): local rules alone found nothing in a month. |
 | Typing outside Claude Code is multi-line text areas only | URL bars, search and single-line chat boxes are skipped on purpose (logins, private searches). Google Docs needs Tools › Accessibility › screen reader support. |
 | Text someone else wrote, pasted in and typed around, can be marked | Only when pasted without Claude Code's own `pasted_content` tags. Rare, low harm. |
 | One or two subprocess calls a night, ~90s each | Nightly job, no interactive path. Capped at 12 batches a day. |

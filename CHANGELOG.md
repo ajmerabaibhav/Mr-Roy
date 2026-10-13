@@ -6,6 +6,10 @@ broken or deferred is in [TODOS.md](TODOS.md).
 
 ## Install fixes — 13 October 2026
 
+- **`MR_ROY_NO_LLM` removed.** With it set, the local rules' findings never
+  reached the lesson (always zero); rather than fix a mode whose rules found
+  nothing in a month of real dictation, grammar now always goes to Claude
+  Code or Codex. The rules remain only for a Mac with neither installed.
 - **Python 3.9 is enough; the Mac's own Python works.** All 62 tests pass
   on /usr/bin/python3 (3.9.6). The only failure there was its old pip
   (21.2) compiling PyObjC from source; the install line now upgrades pip.

@@ -8,7 +8,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from mr_roy import config, log, report, schedule, textboxes, typed, wispr
+from mr_roy import config, grammar, log, report, schedule, textboxes, typed, wispr
 
 
 @pytest.fixture(autouse=True)
@@ -24,7 +24,7 @@ def isolated_data(tmp_path, monkeypatch):
     # checker shells out to the real Claude CLI. A test does neither.
     monkeypatch.setattr(typed, "PROJECTS", tmp_path / "projects")
     monkeypatch.setattr(typed, "CODEX_HISTORY", tmp_path / "codex-history.jsonl")
-    monkeypatch.setenv("MR_ROY_NO_LLM", "1")
+    monkeypatch.setattr(grammar, "LLM_CLI", "no-grammar-cli-in-tests")
     monkeypatch.setattr(schedule, "LOG_DIR", tmp_path / "logs")
     # Paths fixed at import, so redirected one by one: a test once deleted
     # the real .accessibility-granted (10 Oct).

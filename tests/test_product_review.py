@@ -118,11 +118,9 @@ def test_dictation_quote_contains_the_mistake():
 
 
 def test_jobs_keep_ai_settings_and_this_install(monkeypatch, tmp_path):
-    monkeypatch.setenv("MR_ROY_NO_LLM", "1")
     monkeypatch.setenv("MR_ROY_LLM", "codex")
     monkeypatch.setattr(schedule.sys, "executable", str(tmp_path / "python"))
     (tmp_path / "roy").touch()
     data = schedule.plist_for("com.mrroy.nightly", schedule.JOBS["com.mrroy.nightly"])
-    assert data["EnvironmentVariables"]["MR_ROY_NO_LLM"] == "1"
     assert data["EnvironmentVariables"]["MR_ROY_LLM"] == "codex"
     assert data["ProgramArguments"][0] == str(tmp_path / "roy")

@@ -28,6 +28,7 @@ import os
 import plistlib
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import time
@@ -90,6 +91,16 @@ def _icon_png() -> bytes:
     return portrait_png(1024, 32)
 
 
+def icns(png: bytes) -> bytes:
+    """An .icns holding one 1024 px PNG (type ic10), written directly.
+
+    sips and then iconutil both failed on some Macs (sandboxes, other macOS
+    versions); this is the same layout iconutil produced here, with no tool.
+    """
+    entry = b"ic10" + struct.pack(">I", len(png) + 8) + png
+    return b"icns" + struct.pack(">I", len(entry) + 8) + entry
+
+
 def launcher() -> str | None:
     """Build Mr Roy.app once; the listener runs inside it so macOS names
     the Accessibility grant "Mr Roy", not "python3.12" (native/launcher.c).
@@ -114,14 +125,7 @@ def launcher() -> str | None:
     try:
         built = subprocess.run(["clang", "-O2", "-o", str(binary), str(source)],
                                capture_output=True, timeout=120).returncode == 0
-        iconset = stamp.with_name("AppIcon.iconset")  # iconutil: sips failed writing its temp file
-        iconset.mkdir(exist_ok=True)
-        (iconset / "icon_512x512@2x.png").write_bytes(icon)
-        made = subprocess.run(["iconutil", "-c", "icns", str(iconset), "-o", str(stamp.with_name("AppIcon.icns"))],
-                              capture_output=True, text=True, timeout=60)
-        if made.returncode:
-            print(f"Mr Roy.app has no icon (iconutil: {made.stderr.strip()}); it works the same.", file=sys.stderr)
-        shutil.rmtree(iconset)
+        stamp.with_name("AppIcon.icns").write_bytes(icns(icon))
         stamp.write_text(digest)  # before signing: a file added after breaks the seal
         # Finder info or a resource fork anywhere in the bundle makes codesign
         # refuse ("detritus not allowed"); the reused folder can carry them.

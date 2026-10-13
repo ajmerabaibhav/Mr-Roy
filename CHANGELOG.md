@@ -6,6 +6,10 @@ broken or deferred is in [TODOS.md](TODOS.md).
 
 ## Install fixes — 13 October 2026
 
+- **App icon no longer depends on `iconutil`**, which failed on some Macs
+  (not reproducible on macOS 26.6.2). The .icns (one 1024 px PNG, ic10) is
+  written in Python; `iconutil -c iconset` reads it back. The icon PNG is
+  unchanged, so existing apps are not rebuilt and keep their grant.
 - **`MR_ROY_NO_LLM` removed.** With it set, the local rules' findings never
   reached the lesson (always zero); rather than fix a mode whose rules found
   nothing in a month of real dictation, grammar now always goes to Claude

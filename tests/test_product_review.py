@@ -124,3 +124,10 @@ def test_jobs_keep_ai_settings_and_this_install(monkeypatch, tmp_path):
     data = schedule.plist_for("com.mrroy.nightly", schedule.JOBS["com.mrroy.nightly"])
     assert data["EnvironmentVariables"]["MR_ROY_LLM"] == "codex"
     assert data["ProgramArguments"][0] == str(tmp_path / "roy")
+
+
+def test_icon_file_needs_no_tool():
+    png = schedule._icon_png()
+    data = schedule.icns(png)
+    assert data[:4] == b"icns" and int.from_bytes(data[4:8], "big") == len(data)
+    assert data[8:12] == b"ic10" and data[16:] == png

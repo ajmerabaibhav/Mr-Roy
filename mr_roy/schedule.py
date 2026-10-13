@@ -117,7 +117,10 @@ def launcher() -> str | None:
     stamp = APP / "Contents" / "Resources" / "source.sha256"
     icon = _icon_png()
     digest = hashlib.sha256(source.read_bytes() + icon + plistlib.dumps(APP_INFO)).hexdigest()
-    if binary.exists() and stamp.exists() and stamp.read_text() == digest:
+    # The icon file too: an app built while iconutil failed has a matching
+    # stamp but no icon, and would otherwise never get one.
+    if (binary.exists() and stamp.exists() and stamp.read_text() == digest
+            and stamp.with_name("AppIcon.icns").exists()):
         return str(binary)
     binary.parent.mkdir(parents=True, exist_ok=True)
     stamp.parent.mkdir(parents=True, exist_ok=True)

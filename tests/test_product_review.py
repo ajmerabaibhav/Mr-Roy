@@ -131,3 +131,21 @@ def test_icon_file_needs_no_tool():
     data = schedule.icns(png)
     assert data[:4] == b"icns" and int.from_bytes(data[4:8], "big") == len(data)
     assert data[8:12] == b"ic10" and data[16:] == png
+
+
+def test_app_without_icon_is_rebuilt(monkeypatch):
+    built = []
+
+    def run(cmd, **kwargs):
+        built.append(cmd[0])
+        if cmd[0] == "clang":
+            schedule.Path(cmd[cmd.index("-o") + 1]).touch()
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(schedule.subprocess, "run", run)
+    icon = schedule.APP / "Contents" / "Resources" / "AppIcon.icns"
+    assert schedule.launcher() and icon.exists()
+    built.clear()
+    assert schedule.launcher() and built == []  # intact app: left alone, grant kept
+    icon.unlink()  # as left by an older build whose iconutil failed
+    assert schedule.launcher() and icon.exists() and "clang" in built

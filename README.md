@@ -29,8 +29,8 @@ macOS. He never opens your microphone and never touches audio.
 
 ## What you need
 
-- **A Mac** and **Python 3.10 or newer** (`python3 --version`). The Mac's own
-  Python is 3.9; get a newer one from python.org or with `brew install python`.
+- **A Mac.** Its own Python (3.9, via Apple's Command Line Tools) is enough;
+  if `python3 --version` asks to install the tools, say yes.
 - **Claude Code or Codex**, installed and logged in. The grammar check runs
   through it once a night, on your own plan; nothing else to pay for.
 - **Wispr Flow** (optional). It is where he reads what you say. Without it
@@ -41,7 +41,7 @@ macOS. He never opens your microphone and never touches audio.
 ```bash
 git clone https://github.com/ajmerabaibhav/Mr-Roy.git mr-roy
 cd mr-roy && python3 -m venv .venv && source .venv/bin/activate
-pip install -e . && roy setup
+pip install -U pip && pip install -e . && roy setup
 ```
 
 To have `roy` in every new terminal, add `~/mr-roy/.venv/bin` to your PATH.

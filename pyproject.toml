@@ -3,7 +3,7 @@ name = "mr-roy"
 version = "0.1.0"
 description = "An English teacher for macOS: reads how you write and what you dictate, and hands you a grammar lesson every morning."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 license = { text = "MIT" }
 dependencies = [
     "pyobjc-framework-ApplicationServices>=10",  # the text box you are typing in

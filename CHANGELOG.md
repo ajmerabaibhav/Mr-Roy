@@ -6,6 +6,9 @@ broken or deferred is in [TODOS.md](TODOS.md).
 
 ## Install fixes — 13 October 2026
 
+- **Python 3.9 is enough; the Mac's own Python works.** All 62 tests pass
+  on /usr/bin/python3 (3.9.6). The only failure there was its old pip
+  (21.2) compiling PyObjC from source; the install line now upgrades pip.
 - **Background jobs ignored `MR_ROY_NO_LLM` and `MR_ROY_LLM`**: launchd does
   not see your shell. Any `MR_ROY_*` set when you run setup/install is now
   written into the jobs; unset still means auto-pick Claude, else Codex.
